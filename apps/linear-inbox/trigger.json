@@ -1,0 +1,21 @@
+curl -X POST 'https://api.novu.co/v1/events/trigger' \
+-H 'Authorization: ApiKey NOVU_SECRET_KEY' \
+-H 'Content-Type: application/json' \
+-d '{
+  "name": "new-comment",
+  "to": {
+    "subscriberId": "625f3fe55a55980017dd63fd",
+    "email": "emil@novu.co"
+  },
+  "payload": {
+    "commenterName": "commenterName",
+    "commentText": "commentText",
+    "issueId": "issueId",
+    "issueTitle": "issueTitle",
+    "commenterUsername": "commenterUsername",
+    "numberOfUnreadMessages": "numberOfUnreadMessages",
+    "issueInboxLink": "issueInboxLink",
+    "unsubscribeUrl": "unsubscribeUrl"
+  }
+}'
+  
