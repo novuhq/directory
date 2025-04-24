@@ -1,172 +1,168 @@
+// pages/preferences/email.tsx
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sidebar } from "@/components/sidebar"
-import Link from "next/link"
-import { ChevronLeft } from "lucide-react"
-import { useState } from "react"
+import { NotificationCard } from "@/components/preferences/notifications/NotificationCard"
+import { NotificationToggle } from "@/components/preferences/notifications/NotificationToggle"
+import { FormSelect } from "@/components/preferences/ui/FormSelect"
+import { PreferencesLayout } from "@/components/preferences/layout/PreferencesLayout"
+import { useState, useEffect } from "react"
+import { useWorkflowChannelPreferences } from "@/components/preferences/hooks/updatePreferences";
+
+const WORKFLOW_IDS = {
+  documentChanges: "document-changes-workflow-id",
+  projectUpdates: "project-updates-workflow-id", 
+  teamMemberChanges: "team-member-changes-workflow-id",
+  weeklySummary: "weekly-summary-workflow-id"
+}
 
 export default function EmailNotificationsPage() {
-  // State for each checkbox
-  const [documentChanges, setDocumentChanges] = useState(true)
-  const [projectUpdates, setProjectUpdates] = useState(true)
-  const [teamMemberChanges, setTeamMemberChanges] = useState(true)
-  const [weeklySummary, setWeeklySummary] = useState(true)
+  // Get preferences using custom hook
+  const { 
+    isLoading, 
+    error, 
+    isChannelEnabled, 
+    updateChannelPreference 
+  } = useWorkflowChannelPreferences();
 
-  // Handler functions for each checkbox
-  const handleDocumentChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDocumentChanges(e.target.checked)
-    console.log("Document changes notification:", e.target.checked)
+  // Check if email is enabled for each workflow
+  const isDocumentEmailEnabled = isChannelEnabled(WORKFLOW_IDS.documentChanges, 'email');
+  const isProjectUpdatesEmailEnabled = isChannelEnabled(WORKFLOW_IDS.projectUpdates, 'email');
+  const isTeamMemberChangesEmailEnabled = isChannelEnabled(WORKFLOW_IDS.teamMemberChanges, 'email');
+  const isWeeklySummaryEmailEnabled = isChannelEnabled(WORKFLOW_IDS.weeklySummary, 'email');
+
+  // State for each checkbox (fallback values in case API fails)
+  const [documentChanges, setDocumentChanges] = useState<boolean>(isDocumentEmailEnabled || true);
+  const [projectUpdates, setProjectUpdates] = useState<boolean>(isProjectUpdatesEmailEnabled || true);
+  const [teamMemberChanges, setTeamMemberChanges] = useState<boolean>(isTeamMemberChangesEmailEnabled || true);
+  const [weeklySummary, setWeeklySummary] = useState<boolean>(isWeeklySummaryEmailEnabled || true);
+
+  // Update preferences functions for each workflow
+  const updateDocumentEmailPreference = (enabled: boolean) => {
+    updateChannelPreference(WORKFLOW_IDS.documentChanges, 'email', enabled);
+  };
+
+  const updateProjectUpdatesEmailPreference = (enabled: boolean) => {
+    updateChannelPreference(WORKFLOW_IDS.projectUpdates, 'email', enabled);
+  };
+
+  const updateTeamMemberChangesEmailPreference = (enabled: boolean) => {
+    updateChannelPreference(WORKFLOW_IDS.teamMemberChanges, 'email', enabled);
+  };
+
+  const updateWeeklySummaryEmailPreference = (enabled: boolean) => {
+    updateChannelPreference(WORKFLOW_IDS.weeklySummary, 'email', enabled);
+  };
+
+  // Sync local state with API preferences when they load
+  useEffect(() => {
+    if (!isLoading) {
+      setDocumentChanges(isDocumentEmailEnabled || true);
+      setProjectUpdates(isProjectUpdatesEmailEnabled || true);
+      setTeamMemberChanges(isTeamMemberChangesEmailEnabled || true);
+      setWeeklySummary(isWeeklySummaryEmailEnabled || true);
+    }
+  }, [isLoading, isDocumentEmailEnabled, isProjectUpdatesEmailEnabled, isTeamMemberChangesEmailEnabled, isWeeklySummaryEmailEnabled]);
+
+  // Logging function
+  const logChange = (settingName: string, value: boolean) => {
+    console.log(`${settingName} notification:`, value);
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <PreferencesLayout title="Email Notifications">
+        <div>Loading your notification preferences...</div>
+      </PreferencesLayout>
+    );
   }
 
-  const handleProjectUpdates = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProjectUpdates(e.target.checked)
-    console.log("Project updates notification:", e.target.checked)
-  }
-
-  const handleTeamMemberChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTeamMemberChanges(e.target.checked)
-    console.log("Team member changes notification:", e.target.checked)
-  }
-
-  const handleWeeklySummary = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWeeklySummary(e.target.checked)
-    console.log("Weekly summary notification:", e.target.checked)
+  // Show error state
+  if (error) {
+    return (
+      <PreferencesLayout title="Email Notifications">
+        <div>Error loading preferences: {error.message}</div>
+      </PreferencesLayout>
+    );
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Left Sidebar */}
-      <Sidebar />
+    <PreferencesLayout title="Email Notifications">
+      <NotificationCard
+        title="Email notification settings"
+        description="Choose which notifications you receive via email"
+      >
+        <NotificationToggle
+          id="email-documents"
+          title="Document changes"
+          description="When documents are created or updated"
+          defaultChecked={isDocumentEmailEnabled}
+          onChange={(checked) => {
+            setDocumentChanges(checked);
+            updateDocumentEmailPreference(checked);
+            logChange("Document changes", checked);
+          }}
+        />
+        
+        <NotificationToggle
+          id="email-projects"
+          title="Project updates"
+          description="When project details or settings change"
+          defaultChecked={isProjectUpdatesEmailEnabled}
+          onChange={(checked) => {
+            setProjectUpdates(checked );
+            updateProjectUpdatesEmailPreference(checked);
+            logChange("Project updates", checked);
+          }}
+        />
+        
+        <NotificationToggle
+          id="email-team"
+          title="Team member changes"
+          description="When team members are added or removed"
+          defaultChecked={isTeamMemberChangesEmailEnabled}
+          onChange={(checked) => {
+            setTeamMemberChanges(checked);
+            updateTeamMemberChangesEmailPreference(checked);
+            logChange("Team member changes", checked);
+          }}
+        />
+        
+        <NotificationToggle
+          id="email-summary"
+          title="Weekly summary"
+          description="Weekly digest of workspace activity"
+          defaultChecked={isWeeklySummaryEmailEnabled}
+          onChange={(checked) => {
+            setWeeklySummary(checked);
+            updateWeeklySummaryEmailPreference(checked);
+            logChange("Weekly summary", checked);
+          }}
+          hasBorder={false}
+        />
+      </NotificationCard>
 
-      {/* Main Content */}
-      <div className="flex-1 flex justify-center overflow-auto">
-        <div className="w-full max-w-4xl px-6 py-8">
-          <div className="flex items-center gap-2 mb-6">
-            <Link href="/preferences" className="text-zinc-500 hover:text-zinc-900">
-              <ChevronLeft className="h-4 w-4" />
-            </Link>
-            <h1 className="text-2xl font-bold">Email Notifications</h1>
-          </div>
-          
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Email notification settings</CardTitle>
-                <CardDescription>Choose which notifications you receive via email</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="p-4 border-b border-zinc-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Document changes</h3>
-                      <p className="text-sm text-zinc-500">When documents are created or updated</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id="email-documents" 
-                        className="h-4 w-4" 
-                        checked={documentChanges}
-                        onChange={handleDocumentChanges}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 border-b border-zinc-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Project updates</h3>
-                      <p className="text-sm text-zinc-500">When project details or settings change</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id="email-projects" 
-                        className="h-4 w-4" 
-                        checked={projectUpdates}
-                        onChange={handleProjectUpdates}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 border-b border-zinc-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Team member changes</h3>
-                      <p className="text-sm text-zinc-500">When team members are added or removed</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id="email-team" 
-                        className="h-4 w-4" 
-                        checked={teamMemberChanges}
-                        onChange={handleTeamMemberChanges}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Weekly summary</h3>
-                      <p className="text-sm text-zinc-500">Weekly digest of workspace activity</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id="email-summary" 
-                        className="h-4 w-4" 
-                        checked={weeklySummary}
-                        onChange={handleWeeklySummary}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Email preferences</CardTitle>
-                <CardDescription>Configure how you receive email notifications</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="p-4 border-b border-zinc-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Notification frequency</h3>
-                      <p className="text-sm text-zinc-500">How often you receive notification emails</p>
-                    </div>
-                    <select className="h-9 rounded-md border border-zinc-200 px-3">
-                      <option>Immediately</option>
-                      <option>Daily digest</option>
-                      <option>Weekly digest</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Email format</h3>
-                      <p className="text-sm text-zinc-500">Choose your preferred email format</p>
-                    </div>
-                    <select className="h-9 rounded-md border border-zinc-200 px-3">
-                      <option>HTML</option>
-                      <option>Plain text</option>
-                    </select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
+      <NotificationCard
+        title="Email preferences"
+        description="Configure how you receive email notifications"
+      >
+        <FormSelect
+          label="Notification frequency"
+          description="How often you receive notification emails"
+          options={["Immediately", "Daily digest", "Weekly digest"]}
+          defaultValue="Immediately"
+          onChange={(value) => console.log("Frequency changed to:", value)}
+        />
+        
+        <FormSelect
+          label="Email format"
+          description="Choose your preferred email format"
+          options={["HTML", "Plain text"]}
+          defaultValue="HTML"
+          onChange={(value) => console.log("Format changed to:", value)}
+          hasBorder={false}
+        />
+      </NotificationCard>
+    </PreferencesLayout>
   )
-} 
+}
