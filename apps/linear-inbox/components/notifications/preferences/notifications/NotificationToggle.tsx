@@ -1,16 +1,16 @@
 // components/preferences/notifications/NotificationToggle.tsx
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 
 interface NotificationToggleProps {
-  id: string
-  title: string
-  description: string
-  defaultChecked?: boolean
-  disabled?: boolean
-  onChange?: (checked: boolean) => void
-  hasBorder?: boolean
+  id: string;
+  title: string;
+  description: string;
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  onChange?: (checked: boolean) => void;
+  hasBorder?: boolean;
 }
 
 export function NotificationToggle({
@@ -20,19 +20,19 @@ export function NotificationToggle({
   defaultChecked = false,
   disabled = false,
   onChange,
-  hasBorder = true
+  hasBorder = true,
 }: NotificationToggleProps) {
-  const [checked, setChecked] = useState(defaultChecked)
+  const [checked, setChecked] = useState(defaultChecked);
 
   // Update internal state if defaultChecked prop changes
   useEffect(() => {
-    setChecked(defaultChecked)
-  }, [defaultChecked])
+    setChecked(defaultChecked);
+  }, [defaultChecked]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(e.target.checked)
-    onChange?.(e.target.checked)
-  }
+    setChecked(e.target.checked);
+    onChange?.(e.target.checked);
+  };
 
   return (
     <div className={`p-4 ${hasBorder ? "border-b border-zinc-200" : ""}`}>
@@ -42,10 +42,10 @@ export function NotificationToggle({
           <p className="text-sm text-zinc-500">{description}</p>
         </div>
         <div className="flex items-center space-x-2">
-          <input 
-            type="checkbox" 
-            id={id} 
-            className="h-4 w-4" 
+          <input
+            type="checkbox"
+            id={id}
+            className="h-4 w-4"
             checked={checked}
             disabled={disabled}
             onChange={handleChange}
@@ -53,5 +53,5 @@ export function NotificationToggle({
         </div>
       </div>
     </div>
-  )
+  );
 }

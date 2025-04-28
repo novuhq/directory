@@ -5,12 +5,12 @@ import { useState, useEffect } from "react";
 const mockPreferences = [
   {
     workflow: { id: "workflow1" },
-    channels: { email: true, inApp: true, push: false }
+    channels: { email: true, inApp: true, push: false },
   },
   {
     workflow: { id: "workflow2" },
-    channels: { email: true, inApp: false, push: true }
-  }
+    channels: { email: true, inApp: false, push: true },
+  },
 ];
 
 export function useWorkflowChannelPreferences() {
@@ -20,7 +20,7 @@ export function useWorkflowChannelPreferences() {
 
   // Get a workflow by ID
   const getWorkflowPreference = (workflowId: string) => {
-    return preferences?.find(pref => pref.workflow?.id === workflowId);
+    return preferences?.find((pref) => pref.workflow?.id === workflowId);
   };
 
   // Check if a channel is enabled for a workflow
@@ -30,13 +30,19 @@ export function useWorkflowChannelPreferences() {
   };
 
   // Update a channel for a workflow
-  const updateChannelPreference = async (workflowId: string, channelType: string, enabled: boolean) => {
+  const updateChannelPreference = async (
+    workflowId: string,
+    channelType: string,
+    enabled: boolean,
+  ) => {
     try {
       setIsLoading(true);
-      
+
       // Find the preference to update
-      const preferenceIndex = preferences.findIndex(pref => pref.workflow?.id === workflowId);
-      
+      const preferenceIndex = preferences.findIndex(
+        (pref) => pref.workflow?.id === workflowId,
+      );
+
       if (preferenceIndex !== -1) {
         // Create a new preferences array with the updated channel
         const updatedPreferences = [...preferences];
@@ -44,16 +50,16 @@ export function useWorkflowChannelPreferences() {
           ...updatedPreferences[preferenceIndex],
           channels: {
             ...updatedPreferences[preferenceIndex].channels,
-            [channelType]: enabled
-          }
+            [channelType]: enabled,
+          },
         };
-        
+
         // Update the state
         setPreferences(updatedPreferences);
-        
+
         // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         return true;
       } else {
         console.error(`Workflow with ID ${workflowId} not found`);
@@ -73,7 +79,7 @@ export function useWorkflowChannelPreferences() {
     setIsLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       // In a real implementation, you would fetch from an API
       setPreferences(mockPreferences);
     } catch (error) {
@@ -90,6 +96,6 @@ export function useWorkflowChannelPreferences() {
     refetch,
     getWorkflowPreference,
     isChannelEnabled,
-    updateChannelPreference
+    updateChannelPreference,
   };
 }

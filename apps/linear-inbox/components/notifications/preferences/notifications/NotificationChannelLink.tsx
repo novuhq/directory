@@ -1,16 +1,16 @@
 // components/notifications/NotificationChannelLink.tsx
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ChevronRight } from "lucide-react"
-import { LucideIcon } from "lucide-react"
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface NotificationChannelLinkProps {
-  href: string
-  icon: LucideIcon
-  title: string
-  description: string
-  isLast?: boolean
+  href: string;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  isLast?: boolean;
 }
 
 export function NotificationChannelLink({
@@ -18,11 +18,11 @@ export function NotificationChannelLink({
   icon: Icon,
   title,
   description,
-  isLast = false
+  isLast = false,
 }: NotificationChannelLinkProps) {
   return (
-    <Link 
-      href={href} 
+    <Link
+      href={href}
       className={`flex items-center justify-between p-4 hover:bg-zinc-50 ${!isLast ? "border-b border-zinc-200" : ""}`}
     >
       <div className="flex items-center gap-3">
@@ -36,5 +36,5 @@ export function NotificationChannelLink({
       </div>
       <ChevronRight className="h-4 w-4 text-zinc-400" />
     </Link>
-  )
+  );
 }

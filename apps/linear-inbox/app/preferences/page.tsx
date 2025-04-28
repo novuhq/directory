@@ -1,18 +1,19 @@
 // pages/preferences/index.tsx
-import { NotificationCard } from "@/components/preferences/notifications/NotificationCard"
-import { NotificationToggle } from "@/components/preferences/notifications/NotificationToggle"
-import { NotificationChannels } from "@/components/preferences/notifications/NotificationChannels"
-import { PreferencesLayout } from "@/components/preferences/layout/PreferencesLayout"
+import { NotificationCard } from "@/components/notifications/preferences/notifications/NotificationCard";
+import { NotificationToggle } from "@/components/notifications/preferences/notifications/NotificationToggle";
+import { NotificationChannels } from "@/components/notifications/preferences/notifications/NotificationChannels";
+import { PreferencesLayout } from "@/components/notifications/preferences/layout/PreferencesLayout";
 
 export default function PreferencesPage() {
   return (
     <PreferencesLayout title="Notifications" backLink={undefined}>
       <div className="mb-6">
         <p className="text-zinc-500">
-          Choose how to be notified for workspace activity. Notifications will always go to your Linear inbox.
+          Choose how to be notified for workspace activity. Notifications will
+          always go to your Linear inbox.
         </p>
       </div>
-      
+
       <NotificationCard
         title="Notification channels"
         description="Choose how to be notified for workspace activity"
@@ -30,7 +31,7 @@ export default function PreferencesPage() {
           description="Highlight new features and improvements in the app sidebar"
           defaultChecked
         />
-        
+
         <NotificationToggle
           id="changelog-newsletter"
           title="Changelog newsletter"
@@ -49,14 +50,14 @@ export default function PreferencesPage() {
           description="Email when invitees accept an invite"
           defaultChecked
         />
-        
+
         <NotificationToggle
           id="privacy-updates"
           title="Privacy and legal updates"
           description="Email when privacy policies or terms of service change"
           defaultChecked
         />
-        
+
         <NotificationToggle
           id="dpa-updates"
           title="Data processing agreement (DPA)"
@@ -65,5 +66,5 @@ export default function PreferencesPage() {
         />
       </NotificationCard>
     </PreferencesLayout>
-  )
+  );
 }

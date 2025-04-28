@@ -1,7 +1,7 @@
 // pages/preferences/desktop.tsx
-import { NotificationCard } from "@/components/preferences/notifications/NotificationCard"
-import { NotificationToggle } from "@/components/preferences/notifications/NotificationToggle"
-import { PreferencesLayout } from "@/components/preferences/layout/PreferencesLayout"
+import { NotificationCard } from "@/components/notifications/preferences/notifications/NotificationCard";
+import { NotificationToggle } from "@/components/notifications/preferences/notifications/NotificationToggle";
+import { PreferencesLayout } from "@/components/notifications/preferences/layout/PreferencesLayout";
 
 export default function DesktopNotificationsPage() {
   return (
@@ -16,28 +16,28 @@ export default function DesktopNotificationsPage() {
           description="When you are assigned to an issue"
           defaultChecked
         />
-        
+
         <NotificationToggle
           id="desktop-status"
           title="Status changes"
           description="When an issue's status changes"
           defaultChecked
         />
-        
+
         <NotificationToggle
           id="desktop-comments"
           title="Comments"
           description="When someone comments on an issue"
           defaultChecked
         />
-        
+
         <NotificationToggle
           id="desktop-mentions"
           title="Mentions"
           description="When you are mentioned in a comment"
           defaultChecked
         />
-        
+
         <NotificationToggle
           id="desktop-due-dates"
           title="Due dates"
@@ -47,5 +47,5 @@ export default function DesktopNotificationsPage() {
         />
       </NotificationCard>
     </PreferencesLayout>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   ContextMenuContent,
   ContextMenuItem,
@@ -12,24 +12,25 @@ import {
   BellOff,
   Star,
   Copy,
-  ExternalLink
-} from 'lucide-react';
-import { NotificationContextMenuProps } from './types';
+  ExternalLink,
+} from "lucide-react";
+import { NotificationContextMenuProps } from "./types";
 
-export const NotificationContextMenu: React.FC<NotificationContextMenuProps> = ({ 
-  notification, 
-  onMarkAsRead, 
-  onMarkAsUnread, 
-  onDelete, 
-  onSnooze, 
-  onUnsubscribe, 
-  onFavorite, 
-  onCopy, 
+export const NotificationContextMenu: React.FC<
+  NotificationContextMenuProps
+> = ({
+  notification,
+  onMarkAsRead,
+  onMarkAsUnread,
+  onDelete,
+  onSnooze,
+  onUnsubscribe,
+  onFavorite,
+  onCopy,
   onOpenInDesktop,
-  isReadOverride 
 }) => {
   // Use the override value if provided, otherwise use the notification's isRead property
-  const isRead = isReadOverride !== undefined ? isReadOverride : notification.isRead;
+  const isRead = notification.isRead;
 
   return (
     <ContextMenuContent className="w-64">
@@ -49,37 +50,37 @@ export const NotificationContextMenu: React.FC<NotificationContextMenuProps> = (
           <ContextMenuShortcut>U</ContextMenuShortcut>
         </ContextMenuItem>
       )}
-      
+
       <ContextMenuItem className="gap-3" onClick={onDelete}>
         <Trash2 className="h-4 w-4" />
         Delete notification
       </ContextMenuItem>
-      
+
       <ContextMenuItem className="gap-3" onClick={onSnooze}>
         <Clock className="h-4 w-4" />
         Snooze
         <ContextMenuShortcut>H</ContextMenuShortcut>
       </ContextMenuItem>
-      
+
       <ContextMenuItem className="gap-3" onClick={onUnsubscribe}>
         <BellOff className="h-4 w-4" />
         Unsubscribe
         <ContextMenuShortcut>⇧S</ContextMenuShortcut>
       </ContextMenuItem>
-      
+
       <ContextMenuItem className="gap-3" onClick={onFavorite} disabled>
         <Star className="h-4 w-4" />
         Favorite
         <ContextMenuShortcut>F</ContextMenuShortcut>
       </ContextMenuItem>
-      
+
       <ContextMenuSeparator />
-      
+
       <ContextMenuItem className="gap-3" onClick={onCopy} disabled>
         <Copy className="h-4 w-4" />
         Copy
       </ContextMenuItem>
-      
+
       <ContextMenuItem className="gap-3" onClick={onOpenInDesktop} disabled>
         <ExternalLink className="h-4 w-4" />
         Open in desktop app

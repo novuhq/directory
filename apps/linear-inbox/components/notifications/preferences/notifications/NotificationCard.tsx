@@ -1,20 +1,26 @@
 // components/notifications/NotificationCard.tsx
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface NotificationCardProps {
-  title: string
-  description: string
-  children: React.ReactNode
-  contentClassName?: string
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  contentClassName?: string;
 }
 
 export function NotificationCard({
   title,
   description,
   children,
-  contentClassName = "p-0"
+  contentClassName = "p-0",
 }: NotificationCardProps) {
   return (
     <Card>
@@ -22,9 +28,7 @@ export function NotificationCard({
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className={contentClassName}>
-        {children}
-      </CardContent>
+      <CardContent className={contentClassName}>{children}</CardContent>
     </Card>
-  )
+  );
 }

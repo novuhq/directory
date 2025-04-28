@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "./hooks/useToast";
 import { CheckCircle } from "lucide-react";
 import { DEFAULT_AVATAR } from "./constants";
 import { NotificationItemProps, NotificationData } from "./types";
@@ -10,15 +10,14 @@ import { NotificationTime } from "./NotificationTime";
 import { NotificationContextMenu } from "./NotificationContextMenu";
 import {
   readNotification,
-  unreadNotifications,
+  unreadNotification,
   archiveNotification,
-} from "@/hooks/novuHooks";
+} from "./hooks/notificationHooks";
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onNotificationUpdated,
   onNotificationDeleted,
-  isReadOverride,
   onNotificationClick,
 }) => {
   const { toast } = useToast();
@@ -28,25 +27,23 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
   const avatarSrc = data?.participantAvatar || DEFAULT_AVATAR;
   const actorName = data?.participant || "User";
   const notificationId = notification.id;
-
-  // Use the override value if provided, otherwise use the notification's isRead property
-  const isRead =
-    isReadOverride !== undefined ? isReadOverride : notification.isRead;
+  const isRead = notification.isRead;
 
   // Context menu handlers
   const handleNotificationClick = useCallback(() => {
     console.log("Notification clicked:", notification);
-    
+
     // Call the parent's onNotificationClick function
     onNotificationClick?.(notification);
 
-    handleMarkAsRead();
+    // Read the notification
+    readNotification(notification);
   }, [notification, onNotificationClick]);
 
   const handleMarkAsRead = useCallback(async () => {
     try {
-      await readNotification(notificationId);
-      onNotificationUpdated(notificationId, true);
+      // Read the notification
+      readNotification(notification);
     } catch (error) {
       console.error("Error marking as read:", error);
     }
@@ -54,8 +51,8 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
 
   const handleMarkAsUnread = useCallback(async () => {
     try {
-      await unreadNotifications(notificationId);
-      onNotificationUpdated(notificationId, false);
+      // Unread the notification
+      unreadNotification(notification);
     } catch (error) {
       console.error("Error marking as unread:", error);
     }
@@ -63,13 +60,8 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
 
   const handleDelete = useCallback(async () => {
     try {
-      await archiveNotification(notificationId);
-      onNotificationDeleted(notificationId);
-
-      toast({
-        title: "Notification archived",
-        description: "The notification has been successfully archived.",
-      });
+      // Archive the notification
+      archiveNotification(notification);
     } catch (error) {
       console.error("Failed to archive:", error);
       toast({

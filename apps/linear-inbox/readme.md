@@ -5,17 +5,20 @@ A modern, feature-rich, real-time, stateful inbox component inspired by Linear's
 ## 📦 Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/linear-inbox.git
 cd linear-inbox
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 3. Start the development server:
+
 ```bash
 pnpm dev
 ```
@@ -79,6 +82,7 @@ We welcome contributions! Please follow these steps:
 6. Create a Pull Request
 
 Please ensure your PR adheres to the following guidelines:
+
 - Include tests for new features
 - Update documentation as needed
 - Follow the existing code style

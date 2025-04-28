@@ -1,8 +1,8 @@
 // pages/preferences/slack.tsx
-import { NotificationCard } from "@/components/preferences/notifications/NotificationCard"
-import { NotificationToggle } from "@/components/preferences/notifications/NotificationToggle"
-import { PreferencesLayout } from "@/components/preferences/layout/PreferencesLayout"
-import { Slack } from "lucide-react"
+import { NotificationCard } from "@/components/notifications/preferences/notifications/NotificationCard";
+import { NotificationToggle } from "@/components/notifications/preferences/notifications/NotificationToggle";
+import { PreferencesLayout } from "@/components/notifications/preferences/layout/PreferencesLayout";
+import { Slack } from "lucide-react";
 
 export default function SlackNotificationsPage() {
   return (
@@ -29,7 +29,9 @@ export default function SlackNotificationsPage() {
         </div>
 
         <div className="p-4 text-sm text-zinc-500">
-          Connect your Slack workspace to receive notifications directly in Slack. You'll be able to customize which notifications you receive after connecting.
+          Connect your Slack workspace to receive notifications directly in
+          Slack. You'll be able to customize which notifications you receive
+          after connecting.
         </div>
       </NotificationCard>
 
@@ -43,14 +45,14 @@ export default function SlackNotificationsPage() {
           description="When you are assigned to an issue"
           disabled
         />
-        
+
         <NotificationToggle
           id="slack-status"
           title="Status changes"
           description="When an issue's status changes"
           disabled
         />
-        
+
         <NotificationToggle
           id="slack-mentions"
           title="Mentions"
@@ -65,9 +67,11 @@ export default function SlackNotificationsPage() {
         description="Configure which Slack channels receive notifications"
       >
         <div className="p-4 text-sm text-zinc-500">
-          Channel settings will be available after connecting to Slack. You'll be able to choose which channels receive specific types of notifications.
+          Channel settings will be available after connecting to Slack. You'll
+          be able to choose which channels receive specific types of
+          notifications.
         </div>
       </NotificationCard>
     </PreferencesLayout>
-  )
+  );
 }

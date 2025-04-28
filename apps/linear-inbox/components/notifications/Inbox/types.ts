@@ -1,4 +1,4 @@
-import { Notification } from '@novu/react';
+import { Notification } from "@novu/react";
 
 export interface NotificationData {
   status?: string;

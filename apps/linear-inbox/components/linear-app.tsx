@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Sidebar } from "@/components/sidebar"
-import { IssueDetailSkeleton } from "@/components/issue-detail-skeleton"
-import { NovuInbox } from "@/components/notifications/NovuInbox"
-import { IssueDetail } from "@/components/issue-detail"
-import { Notification } from "@novu/react"
+import { useState, useCallback } from "react";
+import { Sidebar } from "@/components/sidebar";
+import { IssueDetailSkeleton } from "@/components/issue-detail-skeleton";
+import { NovuInbox } from "@/components/notifications/Inbox/NovuInbox";
+import { IssueDetail } from "@/components/issue-detail";
+import { Notification } from "@novu/react";
 
 interface IssueDetail {
   issueId: string;
@@ -14,41 +14,50 @@ interface IssueDetail {
 
 export function LinearApp() {
   const [selectedIssue, setSelectedIssue] = useState<IssueDetail | null>(null);
-  const [selectedNotification, setSelectedNotification] = useState<Notification | undefined>(undefined);
+  const [selectedNotification, setSelectedNotification] = useState<
+    Notification | undefined
+  >(undefined);
 
   // Handle notification click to show issue details
   const handleNotificationClick = (notification: Notification) => {
     // Extract issue ID from notification payload
-    const issueId = notification.data?.issueId as string || '';
-    const issueTitle = notification.data?.issueTitle as string || '';
+    const issueId = (notification.data?.issueId as string) || "";
+    const issueTitle = (notification.data?.issueTitle as string) || "";
     console.log("Issue ID:", issueId);
 
     setSelectedIssue({ issueId, issueTitle });
     setSelectedNotification(notification);
   };
 
+  // Handle notification deletion
+  const handleDelete = useCallback(() => {
+    setSelectedIssue(null);
+    setSelectedNotification(undefined);
+  }, []);
+
   return (
-      <div className="flex h-screen overflow-hidden">
-        {/* Left Sidebar */}
-        <Sidebar/>
+    <div className="flex h-screen overflow-hidden">
+      {/* Left Sidebar */}
+      <Sidebar />
 
-        {/* Middle Panel - Inbox List */}
-        <div className="w-[400px] border-r flex flex-col overflow-hidden">
-          <NovuInbox onNotificationClick={handleNotificationClick} />
-        </div>
-
-        {/* Right Panel - Issue Details or Skeleton */}
-        <div className="flex-1 overflow-auto">
-          {selectedIssue ? (
-            <IssueDetail 
-              issueId={selectedIssue.issueId} 
-              issueTitle={selectedIssue.issueTitle} 
-              notification={selectedNotification}
-            />
-          ) : (
-            <IssueDetailSkeleton />
-          )}
-        </div>
+      {/* Middle Panel - Inbox List */}
+      <div className="w-[400px] border-r flex flex-col overflow-hidden">
+        <NovuInbox onNotificationClick={handleNotificationClick} />
       </div>
-  )
+
+      {/* Right Panel - Issue Details or Skeleton */}
+      <div className="flex-1 overflow-auto">
+        {selectedIssue ? (
+          <IssueDetail
+            issueId={selectedIssue.issueId}
+            issueTitle={selectedIssue.issueTitle}
+            notification={selectedNotification}
+            onDelete={handleDelete}
+          />
+        ) : (
+          <IssueDetailSkeleton />
+        )}
+      </div>
+    </div>
+  );
 }
