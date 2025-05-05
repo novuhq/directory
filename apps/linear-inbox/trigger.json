@@ -1,21 +1,47 @@
-curl -X POST 'https://api.novu.co/v1/events/trigger' \
--H 'Authorization: ApiKey NOVU_SECRET_KEY' \
--H 'Content-Type: application/json' \
--d '{
-  "name": "new-comment",
-  "to": {
-    "subscriberId": "625f3fe55a55980017dd63fd",
-    "email": "emil@novu.co"
-  },
-  "payload": {
-    "commenterName": "commenterName",
-    "commentText": "commentText",
-    "issueId": "issueId",
-    "issueTitle": "issueTitle",
-    "commenterUsername": "commenterUsername",
-    "numberOfUnreadMessages": "numberOfUnreadMessages",
-    "issueInboxLink": "issueInboxLink",
-    "unsubscribeUrl": "unsubscribeUrl"
-  }
-}'
-  
+curl -X GET "https://api.twitter.com/2/users/me" \
+-H "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAJmDbQEAAAAA%2BsUuYG4T5gDo6WEWO5OOE1SFmes%3D4g9BHfjFWajiin1BFCfrygTmAuLGPfsIAeM64p3dChmJkPtDM6"
+
+
+curl -X GET "https://api.twitter.com/2/tweets/1914050002780832165?tweet.fields=created_at,author_id,public_metrics,entities,context_annotations,attachments" \
+-H "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAJmDbQEAAAAA%2BsUuYG4T5gDo6WEWO5OOE1SFmes%3D4g9BHfjFWajiin1BFCfrygTmAuLGPfsIAeM64p3dChmJkPtDM6"
+
+
+curl -X GET "https://api.twitter.com/2/users/1914050002780832165/bookmarks" \
+-H "Authorization: Bearer HiWQi0yoOlPHr9qXdl84WDKyXoqLUyivATK7nIMUacRN3"
+
+Code:
+dE4tUGMyeGZENGthSXZwdUZLMHptZkdhQmNyWkNjamp0VG4yXzhEQlVjZ1gzOjE3NDU5NjAxMzAxMzk6MToxOmFjOjE
+
+
+Access Token:
+1255481257804398593-snB0N06k77NjM6pcm2Ekp4hvb7EjAq
+
+Access Token Secret:
+HiWQi0yoOlPHr9qXdl84WDKyXoqLUyivATK7nIMUacRN3
+
+Client Secret:
+UtqAHyjeuxL-5aSs83yzwsd7L55O90HIy02NJ56G5tFL36kGEd
+
+https://twitter.com/i/oauth2/authorize?response_type=code&client_id=dk9DbVcyZk1oWkVBX1d5eU54Tmk6MTpjaQ
+&redirect_uri=http://localhost:3000/&scope=tweet.read%20users.read%20bookmark.read&state=state&code_challenge=challenge&code_challenge_method=plain
+
+
+curl -X POST https://api.twitter.com/2/oauth2/token \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-H "Authorization: Basic eW91cl9jbGllbnRfaWQ6eW91cl9zZWNyZXQ=" \
+-d "code=dE4tUGMyeGZENGthSXZwdUZLMHptZkdhQmNyWkNjamp0VG4yXzhEQlVjZ1gzOjE3NDU5NjAxMzAxMzk6MToxOmFjOjE&grant_type=authorization_code&redirect_uri=YOUR_REDIRECT_URI&code_verifier=novuchallenge"
+
+curl -X POST "https://api.twitter.com/2/oauth2/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-H "Authorization: Basic 1255481257804398593-snB0N06k77NjM6pcm2Ekp4hvb7EjAq
+" \
+-d "code=dE4tUGMyeGZENGthSXZwdUZLMHptZkdhQmNyWkNjamp0VG4yXzhEQlVjZ1gzOjE3NDU5NjAxMzAxMzk6MToxOmFjOjE&grant_type=authorization_code&redirect_uri=http://localhost:3000/api/callback&code_verifier=novuchallenge"
+
+curl -X GET "https://api.twitter.com/2/users/1914050002780832165/bookmarks" \
+-H "Authorization: Bearer 1255481257804398593-snB0N06k77NjM6pcm2Ekp4hvb7EjAq"
+
+
+{
+  "address": "revolviamah+859443@gmail.com",
+  "token": "ahYHHG/yS2qSn1SW3mBYj9yVWzgFjGL0i9c0CuF70Uo="
+}
