@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight } from 'lucide-react';
-import { DashboardInbox } from '@/components/dashboard-inbox';
+import { NovuInbox } from '@/app/components/DashboardInbox';
 
 export function NotificationsCard({ unreadCount }: { unreadCount: number }) {
   return (
@@ -24,7 +24,7 @@ export function NotificationsCard({ unreadCount }: { unreadCount: number }) {
           </Button>
         </Link>
       </CardHeader>
-      <DashboardInbox />
+      <NovuInbox />
     </Card>
   );
 }

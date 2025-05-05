@@ -11,10 +11,6 @@ if (!applicationIdentifier || !subscriberId) {
 
 const tabs = [
   {
-    label: 'All',
-    filter: { tags: [] },
-  },
-  {
     label: 'Messages',
     filter: { tags: ['Messages'] },
   },

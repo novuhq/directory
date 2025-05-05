@@ -1,29 +1,37 @@
+'use client';
+
 import { Inbox, InboxContent } from '@novu/nextjs';
 
+const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
+const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID;
+
+if (!applicationIdentifier || !subscriberId) {
+  throw new Error('Novu environment variables are not properly configured');
+}
+
 const inboxConfig = {
-  applicationIdentifier: '_EYlz4GL3-nL',
-  subscriberId: '625f3fe55a55980017dd63fd',
+  applicationIdentifier,
+  subscriberId,
+
 
   appearance: {
     elements: {
+      inboxContent: {
+        width: '100%',
+        height: '430px',
+        borderRadius: 'rounded-lg border',
+      },
       inboxHeader: {
         display: 'none',
       },
-      notification: {
-        backgroundColor: 'transparent',
-      },
       inbox__popoverTrigger: {
         display: 'none',
-      },
-      inboxContent: {
-        maxWidth: '100%',
-        height: '400px',
       },
     },
   },
 };
 
-export function DashboardInbox() {
+export function NovuInbox() {
   return (
     <>
       <style jsx global>{`
