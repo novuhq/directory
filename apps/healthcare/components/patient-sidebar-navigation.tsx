@@ -38,7 +38,7 @@ import {
   SidebarMenuButton,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { useUnreadCount } from '@/app/notifications/hooks/unreadCount';
+import { useUnreadCount } from '@/app/notifications/hooks/novuHooks';
 
 export function PatientSidebarNavigation() {
   const pathname = usePathname();

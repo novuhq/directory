@@ -15,21 +15,24 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
-
+import { markAllAsRead } from '../hooks/novuHooks';
 type NotificationHeaderVariant = 'default' | 'preferences';
 
 interface NotificationHeaderProps {
   variant?: NotificationHeaderVariant;
+  onMarkAllAsRead?: () => void;
 }
 
-export function NotificationsHeader({ variant = 'default' }: NotificationHeaderProps) {
+export function NotificationsHeader({ variant = 'default', onMarkAllAsRead }: NotificationHeaderProps) {
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
 
   const handleMarkAllAsRead = async () => {
     setIsMarkingAsRead(true);
     try {
+      await markAllAsRead();
       // TODO: Implement the actual API call to mark notifications as read
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulated API call
+      onMarkAllAsRead?.();
     } finally {
       setIsMarkingAsRead(false);
     }

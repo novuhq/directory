@@ -46,3 +46,9 @@ export function useUnreadCount() {
 
   return count;
 }
+
+
+export async function markAllAsRead() {
+  await novu.notifications.readAll({
+  });
+}

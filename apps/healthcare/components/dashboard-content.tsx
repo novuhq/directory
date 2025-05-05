@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PatientDashboardLayout } from '@/components/patient-dashboard-layout';
 import { HealthMetricsChart } from '@/components/health-metrics-chart';
 import { Input } from '@/components/ui/input';
-import { useUnreadCount } from '@/app/notifications/hooks/unreadCount';
+import { useUnreadCount } from '@/app/notifications/hooks/novuHooks';
 
 export function DashboardContent() {
   return (

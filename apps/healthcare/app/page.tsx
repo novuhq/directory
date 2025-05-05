@@ -1,5 +1,5 @@
 'use client';
-import { useUnreadCount } from '@/app/notifications/hooks/unreadCount';
+import { useUnreadCount } from '@/app/notifications/hooks/novuHooks';
 import { PatientDashboardLayout } from '@/components/patient-dashboard-layout';
 import { WelcomeHeader } from '@/app/components/WelcomeHeader';
 import { QuickActions } from '@/app/components/QuickActions';
