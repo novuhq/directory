@@ -1,18 +1,25 @@
-import { Video, MapPin, Clock } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Video, MapPin, Clock } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface AppointmentCardProps {
-  type: "virtual" | "in-person"
-  doctor: string
-  specialty: string
-  date: string
-  duration: string
-  location?: string
+  type: 'virtual' | 'in-person';
+  doctor: string;
+  specialty: string;
+  date: string;
+  duration: string;
+  location?: string;
 }
 
-export function AppointmentCard({ type, doctor, specialty, date, duration, location }: AppointmentCardProps) {
+export function AppointmentCard({
+  type,
+  doctor,
+  specialty,
+  date,
+  duration,
+  location,
+}: AppointmentCardProps) {
   return (
     <div className="flex items-start gap-4 rounded-lg border p-4">
       <Avatar className="h-10 w-10">
@@ -24,9 +31,11 @@ export function AppointmentCard({ type, doctor, specialty, date, duration, locat
           <h4 className="font-medium">{doctor}</h4>
           <Badge
             variant="outline"
-            className={type === "virtual" ? "bg-sky-50 text-sky-700" : "bg-emerald-50 text-emerald-700"}
+            className={
+              type === 'virtual' ? 'bg-sky-50 text-sky-700' : 'bg-emerald-50 text-emerald-700'
+            }
           >
-            {type === "virtual" ? "Virtual" : "In-Person"}
+            {type === 'virtual' ? 'Virtual' : 'In-Person'}
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground">{specialty}</p>
@@ -48,7 +57,7 @@ export function AppointmentCard({ type, doctor, specialty, date, duration, locat
         )}
       </div>
       <div className="flex flex-col gap-2">
-        {type === "virtual" ? (
+        {type === 'virtual' ? (
           <Button size="sm" className="whitespace-nowrap">
             <Video className="mr-2 h-4 w-4" />
             Join
@@ -64,5 +73,5 @@ export function AppointmentCard({ type, doctor, specialty, date, duration, locat
         </Button>
       </div>
     </div>
-  )
+  );
 }

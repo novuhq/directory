@@ -1,5 +1,6 @@
-import type { Metadata } from "next"
-import Link from "next/link"
+'use client';
+
+import Link from 'next/link';
 import {
   Calendar,
   MessageSquare,
@@ -11,26 +12,21 @@ import {
   ChevronRight,
   Clock,
   ArrowUpRight,
-  Bell,
   Search,
-} from "lucide-react"
+} from 'lucide-react';
+import { DashboardInbox } from '@/components/dashboard-inbox';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PatientDashboardLayout } from '@/components/patient-dashboard-layout';
+import { HealthMetricsChart } from '@/components/health-metrics-chart';
+import { Input } from '@/components/ui/input';
+import { useUnreadCount } from '@/app/notifications/hooks/unreadCount';
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PatientDashboardLayout } from "@/components/patient-dashboard-layout"
-import { HealthMetricsChart } from "@/components/health-metrics-chart"
-import { Input } from "@/components/ui/input"
-
-export const metadata: Metadata = {
-  title: "Dashboard | OneHealth",
-  description: "Manage your healthcare in one place",
-}
-
-export default function DashboardPage() {
+export function DashboardContent() {
   return (
     <PatientDashboardLayout>
       <div className="flex flex-col gap-6">
@@ -49,7 +45,11 @@ export default function DashboardPage() {
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto mt-4 md:mt-0">
             <div className="relative flex-1 sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input type="search" placeholder="Search..." className="w-full pl-8 focus-visible:ring-sky-500" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="w-full pl-8 focus-visible:ring-sky-500"
+              />
             </div>
             <Button className="whitespace-nowrap">
               <Plus className="mr-2 h-4 w-4" />
@@ -60,7 +60,7 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link href="/dashboard/appointments" className="block">
+          <div className="block">
             <Card className="h-full hover:border-sky-200 hover:shadow-md transition-all">
               <CardContent className="p-4 flex flex-col items-center text-center">
                 <div className="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center mb-3">
@@ -70,22 +70,17 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">Schedule or manage visits</p>
               </CardContent>
             </Card>
-          </Link>
-          <Link href="/dashboard/messages" className="block">
-            <Card className="h-full hover:border-sky-200 hover:shadow-md transition-all">
-              <CardContent className="p-4 flex flex-col items-center text-center">
-                <div className="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center mb-3 relative">
-                  <MessageSquare className="h-5 w-5 text-sky-600" />
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-medium">
-                    3
-                  </span>
-                </div>
-                <h3 className="font-medium mb-1">Messages</h3>
-                <p className="text-xs text-muted-foreground">Communicate with your care team</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/dashboard/prescriptions" className="block">
+          </div>
+          <Card className="h-full hover:border-sky-200 hover:shadow-md transition-all">
+            <CardContent className="p-4 flex flex-col items-center text-center">
+              <div className="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center mb-3 relative">
+                <MessageSquare className="h-5 w-5 text-sky-600" />
+              </div>
+              <h3 className="font-medium mb-1">Messages</h3>
+              <p className="text-xs text-muted-foreground">Communicate with your care team</p>
+            </CardContent>
+          </Card>
+          <div className="block">
             <Card className="h-full hover:border-sky-200 hover:shadow-md transition-all">
               <CardContent className="p-4 flex flex-col items-center text-center">
                 <div className="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center mb-3">
@@ -95,8 +90,8 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">View and refill prescriptions</p>
               </CardContent>
             </Card>
-          </Link>
-          <Link href="/dashboard/medical-records" className="block">
+          </div>
+          <div className="block">
             <Card className="h-full hover:border-sky-200 hover:shadow-md transition-all">
               <CardContent className="p-4 flex flex-col items-center text-center">
                 <div className="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center mb-3">
@@ -106,7 +101,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">Access your medical records</p>
               </CardContent>
             </Card>
-          </Link>
+          </div>
         </div>
 
         {/* Upcoming Appointments and Notifications */}
@@ -115,12 +110,17 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-semibold">Upcoming Appointments</CardTitle>
-              <Link href="/dashboard/appointments">
-                <Button variant="ghost" size="sm" className="text-sky-600 h-8 px-2 -mr-2">
+              <div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sky-600 h-8 px-2 -mr-2 opacity-50 cursor-not-allowed"
+                  disabled
+                >
                   View all
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
-              </Link>
+              </div>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-4">
@@ -201,80 +201,22 @@ export default function DashboardPage() {
           </Card>
 
           {/* Notifications */}
-          <Card>
+          <Card className="ring-2 ring-sky-500 ring-offset-2">
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-lg font-semibold">Notifications</CardTitle>
-                <Badge className="bg-red-100 text-red-700 hover:bg-red-200">3 new</Badge>
+                <Badge className="bg-red-100 text-red-700 hover:bg-red-200">
+                  {useUnreadCount()} new
+                </Badge>
               </div>
-              <Link href="/dashboard/notifications">
+              <Link href="/notifications">
                 <Button variant="ghost" size="sm" className="text-sky-600 h-8 px-2 -mr-2">
                   View all
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 bg-sky-50 rounded-lg">
-                  <div className="bg-white p-1.5 rounded-full border border-sky-100">
-                    <MessageSquare className="h-4 w-4 text-sky-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-medium text-sm">Message from Dr. Emily Johnson</h4>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">2h ago</span>
-                    </div>
-                    <p className="text-sm line-clamp-2 mt-0.5">
-                      Your lab results are in. Everything looks good, but I'd like to discuss your vitamin D levels.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-sky-50 rounded-lg">
-                  <div className="bg-white p-1.5 rounded-full border border-sky-100">
-                    <FileText className="h-4 w-4 text-sky-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-medium text-sm">New Lab Results Available</h4>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">Yesterday</span>
-                    </div>
-                    <p className="text-sm line-clamp-2 mt-0.5">Your recent blood work results are now available.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-sky-50 rounded-lg">
-                  <div className="bg-white p-1.5 rounded-full border border-sky-100">
-                    <Pill className="h-4 w-4 text-sky-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-medium text-sm">Prescription Refill Reminder</h4>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">Today</span>
-                    </div>
-                    <p className="text-sm line-clamp-2 mt-0.5">
-                      Your Lisinopril prescription needs to be refilled in 5 days.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 border rounded-lg">
-                  <div className="bg-gray-100 p-1.5 rounded-full">
-                    <Bell className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-medium text-sm">Appointment Confirmation</h4>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">2d ago</span>
-                    </div>
-                    <p className="text-sm line-clamp-2 mt-0.5 text-muted-foreground">
-                      Your appointment with Dr. Michael Chen on May 15 at 2:30 PM has been confirmed.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
+            <DashboardInbox />
           </Card>
         </div>
 
@@ -283,26 +225,38 @@ export default function DashboardPage() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold">Health Metrics</CardTitle>
-              <Link href="/dashboard/health-metrics">
-                <Button variant="ghost" size="sm" className="text-sky-600 h-8 px-2 -mr-2">
-                  View all
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-sky-600 h-8 px-2 -mr-2 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                View all
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
             <Tabs defaultValue="heart-rate">
               <TabsList className="grid grid-cols-3 mb-4 bg-gray-100">
-                <TabsTrigger value="heart-rate" className="flex items-center gap-2 data-[state=active]:bg-white">
+                <TabsTrigger
+                  value="heart-rate"
+                  className="flex items-center gap-2 data-[state=active]:bg-white"
+                >
                   <Heart className="h-4 w-4" />
                   <span className="hidden sm:inline">Heart Rate</span>
                 </TabsTrigger>
-                <TabsTrigger value="blood-pressure" className="flex items-center gap-2 data-[state=active]:bg-white">
+                <TabsTrigger
+                  value="blood-pressure"
+                  className="flex items-center gap-2 data-[state=active]:bg-white"
+                >
                   <Activity className="h-4 w-4" />
                   <span className="hidden sm:inline">Blood Pressure</span>
                 </TabsTrigger>
-                <TabsTrigger value="temperature" className="flex items-center gap-2 data-[state=active]:bg-white">
+                <TabsTrigger
+                  value="temperature"
+                  className="flex items-center gap-2 data-[state=active]:bg-white"
+                >
                   <Activity className="h-4 w-4" />
                   <span className="hidden sm:inline">Weight</span>
                 </TabsTrigger>
@@ -374,12 +328,16 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-semibold">Current Medications</CardTitle>
-              <Link href="/dashboard/prescriptions">
-                <Button variant="ghost" size="sm" className="text-sky-600 h-8 px-2 -mr-2">
-                  View all
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-sky-600 h-8 px-2 -mr-2 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                View all
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-3">
@@ -439,12 +397,15 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-semibold">Preventive Care</CardTitle>
-              <Link href="/dashboard/preventive-care">
-                <Button variant="ghost" size="sm" className="text-sky-600 h-8 px-2 -mr-2">
-                  View all
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-sky-600 h-8 px-2 -mr-2 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                View all
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-4">
@@ -452,7 +413,10 @@ export default function DashboardPage() {
                   <div className="flex justify-between mb-1">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">Annual Physical</span>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <Badge
+                        variant="outline"
+                        className="bg-green-50 text-green-700 border-green-200"
+                      >
                         On track
                       </Badge>
                     </div>
@@ -476,7 +440,10 @@ export default function DashboardPage() {
                   <div className="flex justify-between mb-1">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">Eye Exam</span>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <Badge
+                        variant="outline"
+                        className="bg-green-50 text-green-700 border-green-200"
+                      >
                         Completed
                       </Badge>
                     </div>
@@ -488,7 +455,10 @@ export default function DashboardPage() {
                   <div className="flex justify-between mb-1">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">Flu Vaccine</span>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <Badge
+                        variant="outline"
+                        className="bg-green-50 text-green-700 border-green-200"
+                      >
                         On track
                       </Badge>
                     </div>
@@ -509,12 +479,15 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-semibold">Recent Medical Records</CardTitle>
-            <Link href="/dashboard/medical-records">
-              <Button variant="ghost" size="sm" className="text-sky-600 h-8 px-2 -mr-2">
-                View all
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-sky-600 h-8 px-2 -mr-2 opacity-50 cursor-not-allowed"
+              disabled
+            >
+              View all
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">
@@ -525,7 +498,9 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <h4 className="font-medium">Blood Test Results</h4>
-                    <p className="text-sm text-muted-foreground">Apr 10, 2025 • Dr. Emily Johnson</p>
+                    <p className="text-sm text-muted-foreground">
+                      Apr 10, 2025 • Dr. Emily Johnson
+                    </p>
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" className="gap-1">
@@ -557,7 +532,9 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <h4 className="font-medium">Allergy Test</h4>
-                    <p className="text-sm text-muted-foreground">Feb 15, 2025 • Dr. Sarah Williams</p>
+                    <p className="text-sm text-muted-foreground">
+                      Feb 15, 2025 • Dr. Sarah Williams
+                    </p>
                   </div>
                 </div>
                 <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
@@ -569,5 +546,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </PatientDashboardLayout>
-  )
+  );
 }
