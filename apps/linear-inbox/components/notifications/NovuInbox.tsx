@@ -1,8 +1,8 @@
 "use client";
 
 import { Inbox, InboxContent, Notification } from "@novu/nextjs";
-import { NotificationItem } from "./inbox/notificationItem";
-import { InboxHeader } from "./inbox/inboxHeader";
+import { NotificationItem } from "./notificationItem";
+import { InboxHeader } from "./inboxHeader";
 
 export interface NovuInboxProps {
   handleNotificationClick: (notification: Notification) => void;
