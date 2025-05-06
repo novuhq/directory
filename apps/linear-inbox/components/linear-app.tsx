@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { IssueDetailSkeleton } from "@/components/issue-detail-skeleton";
 import { IssueDetail } from "@/components/issue-detail";
-import { InboxComponent } from "@/components/notifications/inbox/Inbox";
+import { InboxComponent } from "./notifications/inbox/Inbox";
 import { Notification } from "@novu/js";
 
 interface IssueDetail {
