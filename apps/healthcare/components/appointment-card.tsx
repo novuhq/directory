@@ -23,7 +23,9 @@ export function AppointmentCard({
   selected = false,
 }: AppointmentCardProps) {
   return (
-    <div className={`flex items-start gap-4 p-4 ${selected ? 'bg-sky-50' : 'hover:bg-gray-50'} transition-colors`}>
+    <div
+      className={`flex items-start gap-4 p-4 ${selected ? 'bg-sky-50' : 'hover:bg-gray-50'} transition-colors`}
+    >
       <Avatar className="h-10 w-10">
         <AvatarImage src="/placeholder.svg?height=40&width=40" alt={doctor} />
         <AvatarFallback>{doctor.charAt(0)}</AvatarFallback>

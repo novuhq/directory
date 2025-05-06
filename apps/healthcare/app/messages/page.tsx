@@ -1,16 +1,16 @@
-import type { Metadata } from "next"
-import { Search, Plus } from "lucide-react"
+import type { Metadata } from 'next';
+import { Search, Plus } from 'lucide-react';
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PatientDashboardLayout } from "@/components/patient-dashboard-layout"
-import { MessagePreview } from "@/components/message-preview"
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PatientDashboardLayout } from '@/components/patient-dashboard-layout';
+import { MessagePreview } from '@/components/message-preview';
 
 export const metadata: Metadata = {
-  title: "Messages | OneHealth",
-  description: "Communicate with your healthcare providers",
-}
+  title: 'Messages | OneHealth',
+  description: 'Communicate with your healthcare providers',
+};
 
 export default function MessagesPage() {
   return (
@@ -45,7 +45,7 @@ export default function MessagesPage() {
                   <MessagePreview
                     sender="Dr. Emily Johnson"
                     avatar="/placeholder.svg?height=40&width=40"
-                    preview="Your lab results are in. Everything looks good, but I'd like to discuss your vitamin D levels during our appointment tomorrow."
+                    preview="Your lab results are in. Everything looks good, but I&apos;d like to discuss your vitamin D levels during our appointment tomorrow."
                     time="2 hours ago"
                     unread
                   />
@@ -59,7 +59,7 @@ export default function MessagesPage() {
                   <MessagePreview
                     sender="Dr. Emily Johnson"
                     avatar="/placeholder.svg?height=40&width=40"
-                    preview="I've sent over the prescription refill to your pharmacy. It should be ready for pickup by tomorrow afternoon."
+                    preview="I&apos;ve sent over the prescription refill to your pharmacy. It should be ready for pickup by tomorrow afternoon."
                     time="3 days ago"
                     unread
                   />
@@ -100,9 +100,10 @@ export default function MessagesPage() {
                     <div className="flex-1">
                       <div className="bg-gray-100 rounded-lg p-4">
                         <p className="text-sm">
-                          Hi Sarah, I've reviewed your recent lab results. Everything looks good overall, but I noticed
-                          your vitamin D levels are a bit low. This is common, especially during winter months, but I'd
-                          like to discuss this during our appointment tomorrow.
+                          Hi Sarah, I&apos;ve reviewed your recent lab results. Everything looks good
+                          overall, but I noticed your vitamin D levels are a bit low. This is
+                          common, especially during winter months, but I&apos;d like to discuss this
+                          during our appointment tomorrow.
                         </p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
@@ -112,8 +113,8 @@ export default function MessagesPage() {
                     <div className="flex-1 text-right">
                       <div className="bg-sky-100 rounded-lg p-4 inline-block text-left">
                         <p className="text-sm">
-                          Thanks for letting me know, Dr. Johnson. I'll make sure to discuss this tomorrow. Is there
-                          anything I should do in the meantime?
+                          Thanks for letting me know, Dr. Johnson. I&apos;ll make sure to discuss this
+                          tomorrow. Is there anything I should do in the meantime?
                         </p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">Just now</p>
@@ -137,5 +138,5 @@ export default function MessagesPage() {
         </div>
       </div>
     </PatientDashboardLayout>
-  )
+  );
 }

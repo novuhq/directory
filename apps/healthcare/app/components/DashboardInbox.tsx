@@ -13,7 +13,6 @@ const inboxConfig = {
   applicationIdentifier,
   subscriberId,
 
-
   appearance: {
     elements: {
       inboxContent: {

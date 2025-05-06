@@ -1,7 +1,5 @@
 # Healthcare Application Inbox Example
 
-
-
 ## 🛠️ Project Structure
 
 ```
@@ -31,12 +29,14 @@
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone <repository-url>
 cd healthcare
 ```
 
 2. Install dependencies
+
 ```bash
 pnpm install
 # or
@@ -44,6 +44,7 @@ npm install
 ```
 
 3. Start the development server
+
 ```bash
 pnpm dev
 # or

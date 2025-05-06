@@ -18,9 +18,9 @@ export default function NotificationsPage() {
             { label: 'Notifications', href: '/notifications', active: true },
           ]}
         />
-        <NotificationsHeader 
-          variant="default" 
-          onMarkAllAsRead={() => setRefreshKey(prev => prev + 1)} 
+        <NotificationsHeader
+          variant="default"
+          onMarkAllAsRead={() => setRefreshKey((prev) => prev + 1)}
         />
         <NovuInbox key={refreshKey} />
       </div>

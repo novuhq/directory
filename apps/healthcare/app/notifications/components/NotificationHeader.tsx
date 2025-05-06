@@ -23,7 +23,10 @@ interface NotificationHeaderProps {
   onMarkAllAsRead?: () => void;
 }
 
-export function NotificationsHeader({ variant = 'default', onMarkAllAsRead }: NotificationHeaderProps) {
+export function NotificationsHeader({
+  variant = 'default',
+  onMarkAllAsRead,
+}: NotificationHeaderProps) {
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
 
   const handleMarkAllAsRead = async () => {
