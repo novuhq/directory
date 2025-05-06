@@ -3,9 +3,9 @@
 import { useState, useCallback } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { IssueDetailSkeleton } from "@/components/issue-detail-skeleton";
-import { NovuInbox } from "@/components/notifications/Inbox/NovuInbox";
 import { IssueDetail } from "@/components/issue-detail";
-import { Notification } from "@novu/react";
+import { InboxComponent } from "@/components/notifications/inbox/Inbox";
+import { Notification } from "@novu/js";
 
 interface IssueDetail {
   issueId: string;
@@ -23,7 +23,6 @@ export function LinearApp() {
     // Extract issue ID from notification payload
     const issueId = (notification.data?.issueId as string) || "";
     const issueTitle = (notification.data?.issueTitle as string) || "";
-    console.log("Issue ID:", issueId);
 
     setSelectedIssue({ issueId, issueTitle });
     setSelectedNotification(notification);
@@ -42,7 +41,7 @@ export function LinearApp() {
 
       {/* Middle Panel - Inbox List */}
       <div className="w-[400px] border-r flex flex-col overflow-hidden">
-        <NovuInbox onNotificationClick={handleNotificationClick} />
+        <InboxComponent handleNotificationClick={handleNotificationClick} />
       </div>
 
       {/* Right Panel - Issue Details or Skeleton */}

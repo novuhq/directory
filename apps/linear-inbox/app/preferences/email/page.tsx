@@ -86,9 +86,7 @@ export default function EmailNotificationsPage() {
   ]);
 
   // Logging function
-  const logChange = (settingName: string, value: boolean) => {
-    console.log(`${settingName} notification:`, value);
-  };
+  const logChange = (settingName: string, value: boolean) => {};
 
   // Show loading state
   if (isLoading) {

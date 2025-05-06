@@ -18,7 +18,7 @@ import Link from "next/link";
 export function Sidebar() {
   return (
     <div className="w-56 border-r border-zinc-200 bg-[lch(96.667%_0_282.863/1)] flex flex-col h-full overflow-y-auto">
-      <div className="p-3 flex items-center gap-2">
+      <div className="p-4 flex items-center gap-2">
         <div className="h-6 w-6 rounded bg-zinc-100 flex items-center justify-center">
           <Box className="h-4 w-4 text-zinc-900" />
         </div>

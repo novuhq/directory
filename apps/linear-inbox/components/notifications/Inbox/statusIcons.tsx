@@ -1,5 +1,3 @@
-import React from "react";
-import { Notification } from "@novu/react";
 import {
   CheckCircle2,
   XCircle,
@@ -7,16 +5,16 @@ import {
   Clock,
   Circle,
 } from "lucide-react";
-import { NotificationData } from "./types";
 
-interface NotificationStatusIconProps {
-  notification: Notification;
-}
+import { Notification } from "@novu/nextjs";
 
-export const NotificationStatusIcon: React.FC<NotificationStatusIconProps> = ({
+// Component for rendering status icons
+export const NotificationStatusIcon = ({
   notification,
+}: {
+  notification: Notification;
 }) => {
-  const data = notification.data as NotificationData | undefined;
+  const data = notification.data as NotificationData;
   const status = data?.status;
 
   switch (status) {

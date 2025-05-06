@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { BellOff, Clock, Trash2, Paperclip, ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "./ui/textarea";
-import { Notification } from "@novu/react";
+import { Notification } from "@novu/nextjs";
 import { toast } from "sonner";
 import { useCallback } from "react";
 
@@ -48,12 +48,10 @@ export function IssueDetail({
 
   const handleUnsubscribe = () => {
     // Implement unsubscribe functionality here
-    console.log("Unsubscribe clicked");
   };
 
   const handleSnooze = () => {
     // Implement snooze functionality here
-    console.log("Snooze clicked");
   };
 
   const handleDelete = useCallback(async () => {

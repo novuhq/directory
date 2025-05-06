@@ -1,14 +1,18 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  showAnimation?: boolean
+  showAnimation?: boolean;
 }
 
-export function IssueDetailSkeleton({ className, showAnimation = true, ...props }: SkeletonProps) {
+export function IssueDetailSkeleton({
+  className,
+  showAnimation = true,
+  ...props
+}: SkeletonProps) {
   return (
-    <div 
-      className={cn("h-full flex flex-col bg-background", className)} 
+    <div
+      className={cn("h-full flex flex-col bg-background", className)}
       role="status"
       aria-label="Loading issue details"
       {...props}
@@ -159,5 +163,5 @@ export function IssueDetailSkeleton({ className, showAnimation = true, ...props 
         </div>
       </div>
     </div>
-  )
+  );
 }

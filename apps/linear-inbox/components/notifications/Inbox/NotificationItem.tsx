@@ -1,119 +1,117 @@
-import React, { useCallback } from "react";
-import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
-import { useToast } from "./hooks/useToast";
-import { CheckCircle } from "lucide-react";
-import { DEFAULT_AVATAR } from "./constants";
-import { NotificationItemProps, NotificationData } from "./types";
-import { NotificationActionIcon } from "./NotificationActionIcon";
-import { NotificationStatusIcon } from "./NotificationStatusIcon";
-import { NotificationTime } from "./NotificationTime";
-import { NotificationContextMenu } from "./NotificationContextMenu";
+import { useState, useCallback } from "react";
+import { Notification } from "@novu/js";
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+} from "@/components/ui/context-menu";
+import {
+  Mail,
+  Trash2,
+  Clock,
+  BellOff,
+  Star,
+  Copy,
+  ExternalLink,
+} from "lucide-react";
 import {
   readNotification,
   unreadNotification,
   archiveNotification,
-} from "./hooks/notificationHooks";
+} from "./hooks/novuHooks";
+import { NotificationActionIcon } from "./actionIcons";
+import { NotificationStatusIcon } from "./statusIcons";
+import { NotificationTime } from "./timeFormater";
 
-export const NotificationItem: React.FC<NotificationItemProps> = ({
+interface NotificationItemProps {
+  notification: Notification;
+  onClick?: (notification: Notification) => void;
+  onStateChange?: (notification: Notification, isRead: boolean) => void;
+  onDelete?: (notification: Notification) => void;
+}
+
+export const NotificationItem = ({
   notification,
-  onNotificationUpdated,
-  onNotificationDeleted,
-  onNotificationClick,
-}) => {
-  const { toast } = useToast();
-  const data = notification.data as NotificationData | undefined;
+  onClick,
+  onStateChange,
+  onDelete,
+}: NotificationItemProps) => {
+  const [isRead, setIsRead] = useState(notification.isRead);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false); // New state to track if item is deleted
+  const data = notification.data as any;
 
-  // Get avatar with fallback
-  const avatarSrc = data?.participantAvatar || DEFAULT_AVATAR;
+  const avatarSrc =
+    data?.participantAvatar || "https://dashboard.novu.co/images/avatar.svg";
   const actorName = data?.participant || "User";
-  const notificationId = notification.id;
-  const isRead = notification.isRead;
-
-  // Context menu handlers
-  const handleNotificationClick = useCallback(() => {
-    console.log("Notification clicked:", notification);
-
-    // Call the parent's onNotificationClick function
-    onNotificationClick?.(notification);
-
-    // Read the notification
-    readNotification(notification);
-  }, [notification, onNotificationClick]);
 
   const handleMarkAsRead = useCallback(async () => {
     try {
-      // Read the notification
-      readNotification(notification);
+      await readNotification(notification);
+      setIsRead(true);
+      onStateChange?.(notification, true);
     } catch (error) {
-      console.error("Error marking as read:", error);
+      console.error("Failed to mark as read:", error);
     }
-  }, [notificationId, onNotificationUpdated]);
+  }, [notification, onStateChange]);
 
   const handleMarkAsUnread = useCallback(async () => {
     try {
-      // Unread the notification
-      unreadNotification(notification);
+      await unreadNotification(notification);
+      setIsRead(false);
+      onStateChange?.(notification, false);
     } catch (error) {
-      console.error("Error marking as unread:", error);
+      console.error("Failed to mark as unread:", error);
     }
-  }, [notificationId, onNotificationUpdated]);
+  }, [notification, onStateChange]);
 
-  const handleDelete = useCallback(async () => {
+  const handleArchive = useCallback(async () => {
     try {
-      // Archive the notification
-      archiveNotification(notification);
+      setIsDeleting(true);
+
+      setIsDeleted(true);
+
+      onDelete?.(notification);
+
+      await archiveNotification(notification);
     } catch (error) {
       console.error("Failed to archive:", error);
-      toast({
-        title: "Error",
-        description: "Failed to archive the notification.",
-        variant: "destructive",
-      });
+
+      setIsDeleting(false);
+      setIsDeleted(false);
     }
-  }, [notificationId, onNotificationDeleted, toast]);
+  }, [notification, onDelete]);
 
-  const handleSnooze = useCallback(() => {
-    // TODO: Implement snooze functionality
-    console.log("Snoozing notification:", notification);
-  }, [notification]);
+  const handleUnsubscribe = useCallback(() => {}, [notification]);
 
-  const handleUnsubscribe = useCallback(() => {
-    // TODO: Implement unsubscribe functionality
-    toast({
-      variant: "success",
-      description: (
-        <div className="flex items-center gap-2 text-green-900 dark:text-green-100">
-          <CheckCircle className="h-4 w-4 text-green-500" />
-          <span className="font-medium">Unsubscribed from issue updates</span>
-        </div>
-      ),
-      duration: 3000,
-    });
-  }, [toast]);
+  const handleNotificationClick = useCallback(async () => {
+    onClick?.(notification);
 
-  const handleFavorite = useCallback(() => {
-    // TODO: Implement favorite functionality
-    console.log("Toggling favorite:", notification);
-  }, [notification]);
+    if (!isRead) {
+      try {
+        await readNotification(notification);
+        setIsRead(true);
+        onStateChange?.(notification, true);
+      } catch (error) {
+        console.error("Failed to mark as read on click:", error);
+      }
+    }
+  }, [notification, onClick, isRead, onStateChange]);
 
-  const handleCopy = useCallback(() => {
-    // TODO: Implement copy functionality
-    console.log("Copying notification:", notification);
-  }, [notification]);
-
-  const handleOpenInDesktop = useCallback(() => {
-    // TODO: Implement open in desktop functionality
-    console.log("Opening in desktop app:", notification);
-  }, [notification]);
+  if (isDeleted) {
+    return null;
+  }
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
         <div
-          className={`py-3 px-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors border-b border-zinc-200 dark:border-zinc-800 ${!isRead ? "bg-blue-50 dark:bg-blue-900/10" : ""}`}
+          className={`py-3 px-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors border-b border-zinc-200 dark:border-zinc-800 ${!isRead ? "bg-blue-50 dark:bg-blue-900/10" : ""} ${isDeleting ? "opacity-50 pointer-events-none" : ""}`}
           role="button"
           aria-label={`Notification: ${notification.subject}`}
-          tabIndex={0}
           onClick={handleNotificationClick}
         >
           <div className="flex items-center gap-3">
@@ -126,7 +124,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                     alt={`${actorName}'s avatar`}
                     className="h-full w-full object-cover"
                     onError={(e) => {
-                      // Fallback to initial on image load error
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
@@ -149,13 +146,10 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                 <div className="flex-1 min-w-0 overflow-hidden pr-3">
                   <div className="flex items-center gap-2">
                     {!isRead && (
-                      <div
-                        className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0"
-                        aria-hidden="true"
-                      />
+                      <div className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
                     )}
                     <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                      {notification.subject || "Notification"}
+                      {notification.subject}
                     </h3>
                   </div>
 
@@ -166,9 +160,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
 
                 {/* Status and time */}
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                  <div className="flex-shrink-0">
-                    <NotificationStatusIcon notification={notification} />
-                  </div>
+                  <NotificationStatusIcon notification={notification} />
                   <NotificationTime timestamp={notification.createdAt} />
                 </div>
               </div>
@@ -177,18 +169,67 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         </div>
       </ContextMenuTrigger>
 
-      <NotificationContextMenu
-        notification={notification}
-        onMarkAsRead={handleMarkAsRead}
-        onMarkAsUnread={handleMarkAsUnread}
-        onDelete={handleDelete}
-        onSnooze={handleSnooze}
-        onUnsubscribe={handleUnsubscribe}
-        onFavorite={handleFavorite}
-        onCopy={handleCopy}
-        onOpenInDesktop={handleOpenInDesktop}
-        isReadOverride={isRead}
-      />
+      {/* Context Menu Content */}
+      <ContextMenuContent className="w-64">
+        {isRead ? (
+          <ContextMenuItem className="gap-3" onClick={handleMarkAsUnread}>
+            <Mail className="h-4 w-4" />
+            Mark as unread
+            <ContextMenuShortcut>U</ContextMenuShortcut>
+          </ContextMenuItem>
+        ) : (
+          <ContextMenuItem className="gap-3" onClick={handleMarkAsRead}>
+            <div className="relative">
+              <Mail className="h-4 w-4" />
+              {!isRead && (
+                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+              )}
+            </div>
+            Mark as read
+            <ContextMenuShortcut>U</ContextMenuShortcut>
+          </ContextMenuItem>
+        )}
+
+        <ContextMenuItem
+          className="gap-3"
+          onClick={handleArchive}
+          disabled={isDeleting}
+        >
+          <Trash2 className="h-4 w-4" />
+          {isDeleting ? "Deleting..." : "Delete notification"}
+        </ContextMenuItem>
+
+        <ContextMenuItem className="gap-3" disabled>
+          <Clock className="h-4 w-4" />
+          Snooze
+          <ContextMenuShortcut>H</ContextMenuShortcut>
+        </ContextMenuItem>
+
+        <ContextMenuItem className="gap-3" onClick={handleUnsubscribe}>
+          <BellOff className="h-4 w-4" />
+          Unsubscribe
+          <ContextMenuShortcut>⇧S</ContextMenuShortcut>
+        </ContextMenuItem>
+
+        <ContextMenuItem className="gap-3" disabled>
+          <Star className="h-4 w-4" />
+          Favorite
+          <ContextMenuShortcut>F</ContextMenuShortcut>
+        </ContextMenuItem>
+
+        <ContextMenuSeparator />
+
+        <ContextMenuItem className="gap-3" disabled>
+          <Copy className="h-4 w-4" />
+          Copy
+        </ContextMenuItem>
+
+        <ContextMenuItem className="gap-3" disabled>
+          <ExternalLink className="h-4 w-4" />
+          Open in desktop app
+          <ContextMenuShortcut>⌃⌘</ContextMenuShortcut>
+        </ContextMenuItem>
+      </ContextMenuContent>
     </ContextMenu>
   );
 };

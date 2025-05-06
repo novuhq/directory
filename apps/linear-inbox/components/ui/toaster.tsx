@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast } from "@/components/notifications/Inbox/hooks/useToast";
+import { useToast } from "@/components/notifications/inbox/hooks/useToast";
 import {
   Toast,
   ToastClose,
