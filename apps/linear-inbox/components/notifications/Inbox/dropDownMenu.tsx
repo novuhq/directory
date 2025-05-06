@@ -22,7 +22,6 @@ import {
   Star,
   Copy,
   ExternalLink,
-  Bell,
 } from "lucide-react";
 
 interface NotificationContextMenuProps {

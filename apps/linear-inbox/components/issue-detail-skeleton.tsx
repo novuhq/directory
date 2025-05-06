@@ -1,22 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 
-interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  showAnimation?: boolean;
-}
-
-export function IssueDetailSkeleton({
-  className,
-  showAnimation = true,
-  ...props
-}: SkeletonProps) {
+export function IssueDetailSkeleton() {
   return (
-    <div
-      className={cn("h-full flex flex-col bg-background", className)}
-      role="status"
-      aria-label="Loading issue details"
-      {...props}
-    >
+    <div className="flex h-full w-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b">
         <div className="flex items-center gap-2">

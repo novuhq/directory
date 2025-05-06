@@ -15,6 +15,13 @@ interface IssueDetailProps {
   onDelete?: () => void;
 }
 
+interface ActivityItem {
+  user: string;
+  action: string;
+  time: string;
+  avatarUrl: string;
+}
+
 export function IssueDetail({
   issueId,
   issueTitle,
@@ -23,7 +30,7 @@ export function IssueDetail({
   onDelete,
 }: IssueDetailProps) {
   // Hard-coded activity items
-  const activity = [
+  const activity: ActivityItem[] = [
     {
       user: "Radoslaw",
       action: "commented",
@@ -183,7 +190,7 @@ export function IssueDetail({
             </div>
 
             <div className="space-y-4 pl-2">
-              {activity.map((item: any, index: number) => (
+              {activity.map((item: ActivityItem, index: number) => (
                 <div key={index} className="flex items-start gap-3">
                   <Avatar className="h-6 w-6">
                     <AvatarImage

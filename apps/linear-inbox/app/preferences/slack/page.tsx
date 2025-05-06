@@ -30,7 +30,7 @@ export default function SlackNotificationsPage() {
 
         <div className="p-4 text-sm text-zinc-500">
           Connect your Slack workspace to receive notifications directly in
-          Slack. You'll be able to customize which notifications you receive
+          Slack. You&apos;ll be able to customize which notifications you receive
           after connecting.
         </div>
       </NotificationCard>
@@ -49,7 +49,7 @@ export default function SlackNotificationsPage() {
         <NotificationToggle
           id="slack-status"
           title="Status changes"
-          description="When an issue's status changes"
+          description="When an issue&apos;s status changes"
           disabled
         />
 
@@ -67,7 +67,7 @@ export default function SlackNotificationsPage() {
         description="Configure which Slack channels receive notifications"
       >
         <div className="p-4 text-sm text-zinc-500">
-          Channel settings will be available after connecting to Slack. You'll
+          Channel settings will be available after connecting to Slack. You&apos;ll
           be able to choose which channels receive specific types of
           notifications.
         </div>

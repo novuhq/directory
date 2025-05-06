@@ -39,18 +39,14 @@ export default function EmailNotificationsPage() {
   );
 
   // State for each checkbox (fallback values in case API fails)
-  const [documentChanges, setDocumentChanges] = useState<boolean>(
-    isDocumentEmailEnabled || true,
-  );
-  const [projectUpdates, setProjectUpdates] = useState<boolean>(
-    isProjectUpdatesEmailEnabled || true,
-  );
-  const [teamMemberChanges, setTeamMemberChanges] = useState<boolean>(
-    isTeamMemberChangesEmailEnabled || true,
-  );
-  const [weeklySummary, setWeeklySummary] = useState<boolean>(
-    isWeeklySummaryEmailEnabled || true,
-  );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [documentChanges, setDocumentChanges] = useState<boolean>(isDocumentEmailEnabled || true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [projectUpdates, setProjectUpdates] = useState<boolean>(isProjectUpdatesEmailEnabled || true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [teamMemberChanges, setTeamMemberChanges] = useState<boolean>(isTeamMemberChangesEmailEnabled || true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [weeklySummary, setWeeklySummary] = useState<boolean>(isWeeklySummaryEmailEnabled || true);
 
   // Update preferences functions for each workflow
   const updateDocumentEmailPreference = (enabled: boolean) => {
@@ -86,7 +82,9 @@ export default function EmailNotificationsPage() {
   ]);
 
   // Logging function
-  const logChange = (settingName: string, value: boolean) => {};
+  const logChange = () => {
+    // Empty function as it's not currently used
+  };
 
   // Show loading state
   if (isLoading) {
@@ -120,7 +118,7 @@ export default function EmailNotificationsPage() {
           onChange={(checked) => {
             setDocumentChanges(checked);
             updateDocumentEmailPreference(checked);
-            logChange("Document changes", checked);
+            logChange();
           }}
         />
 
@@ -132,7 +130,7 @@ export default function EmailNotificationsPage() {
           onChange={(checked) => {
             setProjectUpdates(checked);
             updateProjectUpdatesEmailPreference(checked);
-            logChange("Project updates", checked);
+            logChange();
           }}
         />
 
@@ -144,7 +142,7 @@ export default function EmailNotificationsPage() {
           onChange={(checked) => {
             setTeamMemberChanges(checked);
             updateTeamMemberChangesEmailPreference(checked);
-            logChange("Team member changes", checked);
+            logChange();
           }}
         />
 
@@ -156,7 +154,7 @@ export default function EmailNotificationsPage() {
           onChange={(checked) => {
             setWeeklySummary(checked);
             updateWeeklySummaryEmailPreference(checked);
-            logChange("Weekly summary", checked);
+            logChange();
           }}
           hasBorder={false}
         />

@@ -25,12 +25,19 @@ import {
 import { NotificationActionIcon } from "./actionIcons";
 import { NotificationStatusIcon } from "./statusIcons";
 import { NotificationTime } from "./timeFormater";
+import Image from "next/image";
 
 interface NotificationItemProps {
   notification: Notification;
   onClick?: (notification: Notification) => void;
   onStateChange?: (notification: Notification, isRead: boolean) => void;
   onDelete?: (notification: Notification) => void;
+}
+
+interface NotificationData {
+  participantAvatar?: string;
+  participant?: string;
+  [key: string]: unknown;
 }
 
 export const NotificationItem = ({
@@ -41,8 +48,8 @@ export const NotificationItem = ({
 }: NotificationItemProps) => {
   const [isRead, setIsRead] = useState(notification.isRead);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false); // New state to track if item is deleted
-  const data = notification.data as any;
+  const [isDeleted, setIsDeleted] = useState(false);
+  const data = notification.data as NotificationData;
 
   const avatarSrc =
     data?.participantAvatar || "https://dashboard.novu.co/images/avatar.svg";
@@ -85,7 +92,7 @@ export const NotificationItem = ({
     }
   }, [notification, onDelete]);
 
-  const handleUnsubscribe = useCallback(() => {}, [notification]);
+  const handleUnsubscribe = useCallback(() => {}, []);
 
   const handleNotificationClick = useCallback(async () => {
     onClick?.(notification);
@@ -119,9 +126,11 @@ export const NotificationItem = ({
             <div className="relative flex-shrink-0">
               <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-700 overflow-hidden flex items-center justify-center">
                 {avatarSrc ? (
-                  <img
+                  <Image
                     src={avatarSrc}
                     alt={`${actorName}'s avatar`}
+                    width={32}
+                    height={32}
                     className="h-full w-full object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";

@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
@@ -582,7 +579,7 @@ export function InboxHeader({
                 </span>
               </form>
               <div className="max-h-48 overflow-auto">
-                {(filterOptions || []).map((option, i) => (
+                {(filterOptions || []).map((option) => (
                   <DropdownMenuSub key={option.label}>
                     <DropdownMenuSubTrigger className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium">
                       <span className="flex items-center justify-center w-5 h-5">
@@ -619,9 +616,9 @@ export function InboxHeader({
                             }
                             className="flex items-center gap-2 px-2 py-2 rounded-md text-sm font-medium"
                           >
-                            {"icon" in sub && (sub as any).icon ? (
+                            {"icon" in sub && sub.icon ? (
                               <span className="flex items-center justify-center w-5 h-5">
-                                {(sub as any).icon}
+                                {sub.icon}
                               </span>
                             ) : null}
                             <span className="ml-1 flex-1 text-left">
