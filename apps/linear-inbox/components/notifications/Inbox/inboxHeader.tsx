@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
+
 interface InboxHeaderProps {
   className?: string;
 }
@@ -153,17 +154,17 @@ const defaultFilterOptions = [
       </svg>
     ),
     options: [
-      { label: "All notifications", count: 0 },
-      { label: "Assignments", count: 0 },
-      { label: "Comments and replies", count: 0 },
-      { label: "Document changes", count: 0 },
-      { label: "Mentions", count: 0 },
-      { label: "Reminders and deadlines", count: 0 },
-      { label: "Status changes", count: 0 },
-      { label: "Project updates", count: 0 },
-      { label: "Team mentions", count: 0 },
-      { label: "Issue updates", count: 0 },
-    ],
+      { label: "All notifications", count: 0, icon: null },
+      { label: "Assignments", count: 0, icon: null },
+      { label: "Comments and replies", count: 0, icon: null },
+      { label: "Document changes", count: 0, icon: null },
+      { label: "Mentions", count: 0, icon: null },
+      { label: "Reminders and deadlines", count: 0, icon: null },
+      { label: "Status changes", count: 0, icon: null },
+      { label: "Project updates", count: 0, icon: null },
+      { label: "Team mentions", count: 0, icon: null },
+      { label: "Issue updates", count: 0, icon: null },
+    ] as Array<{ label: string; count: number; icon: React.ReactNode | null }>,
   },
   {
     label: "Subscription",

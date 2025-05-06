@@ -4,8 +4,8 @@ import { useState, useCallback } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { IssueDetailSkeleton } from "@/components/issue-detail-skeleton";
 import { IssueDetail } from "@/components/issue-detail";
-import { NovuInbox } from "@/components/notifications/inbox/NovuInbox";
 import { Notification } from "@novu/js";
+import { NovuInbox } from "@/components/notifications/inbox/NovuInbox";
 
 interface IssueDetail {
   issueId: string;
