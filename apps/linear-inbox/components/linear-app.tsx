@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { IssueDetailSkeleton } from "@/components/issue-detail-skeleton";
 import { IssueDetail } from "@/components/issue-detail";
-import { InboxComponent } from "./notifications/inbox/Inbox";
+import { LinearInbox } from "./notifications/inbox/Inbox";
 import { Notification } from "@novu/js";
 
 interface IssueDetail {
@@ -41,7 +41,7 @@ export function LinearApp() {
 
       {/* Middle Panel - Inbox List */}
       <div className="w-[400px] border-r flex flex-col overflow-hidden">
-        <InboxComponent handleNotificationClick={handleNotificationClick} />
+        <LinearInbox handleNotificationClick={handleNotificationClick} />
       </div>
 
       {/* Right Panel - Issue Details or Skeleton */}
