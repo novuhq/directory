@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/sidebar";
 import { IssueDetailSkeleton } from "@/components/issue-detail-skeleton";
 import { IssueDetail } from "@/components/issue-detail";
 import { Notification } from "@novu/js";
-import { NovuInbox } from "@/components/notifications/inbox/NovuInbox";
+import { NovuInbox } from "@/components/notifications/NovuInbox";
 
 interface IssueDetail {
   issueId: string;
