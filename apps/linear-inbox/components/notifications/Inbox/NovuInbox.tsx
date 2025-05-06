@@ -4,7 +4,7 @@ import { Inbox, InboxContent, Notification } from "@novu/nextjs";
 import { NotificationItem } from "./notificationItem";
 import { InboxHeader } from "./inboxHeader";
 
-export interface LinearInboxProps {
+export interface NovuInboxProps {
   handleNotificationClick: (notification: Notification) => void;
 }
 
@@ -16,9 +16,9 @@ if (!applicationIdentifier || !subscriberId) {
   throw new Error("Novu environment variables are not properly configured");
 }
 
-export function LinearInbox({
+export function NovuInbox({
   handleNotificationClick,
-}: LinearInboxProps) {
+}: NovuInboxProps) {
   const renderNotification = (notification: Notification) => {
     return (
       <NotificationItem
