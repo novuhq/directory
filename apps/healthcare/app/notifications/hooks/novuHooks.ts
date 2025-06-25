@@ -26,11 +26,11 @@ export function useUnreadCount() {
 
     async function fetchUnreadCount() {
       try {
-        const result = await novu.notifications.count({
+        const result = await novu?.notifications.count({
           filters: [{ read: false }],
         });
         // Sum up all counts from the filters
-        const totalCount = result.data?.counts?.reduce((sum, item) => sum + item.count, 0) || 0;
+        const totalCount = result?.data?.counts?.reduce((sum, item) => sum + item.count, 0) || 0;
         setCount(totalCount);
       } catch (error) {
         console.error('Failed to fetch unread count:', error);
