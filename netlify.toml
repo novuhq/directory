@@ -1,7 +1,6 @@
 [build]
-  base = "apps/healthcare"
-  command = "npm run build"
-  publish = ".next"
+  command = "pnpm install && pnpm build --filter=healthcare-app"
+  publish = "apps/healthcare/.next"
 
 [build.environment]
   NODE_VERSION = "18"
