@@ -6,19 +6,24 @@ import React from 'react';
 const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
 const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID;
 
-if (!applicationIdentifier || !subscriberId) {
-  throw new Error('Novu environment variables are not properly configured');
-}
-
-export const novu = new Novu({
-  applicationIdentifier,
-  subscriberId,
-});
+// Only initialize Novu if environment variables are available
+const novu = applicationIdentifier && subscriberId 
+  ? new Novu({
+      applicationIdentifier,
+      subscriberId,
+    })
+  : null;
 
 export function useUnreadCount() {
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
+    // Don't run if Novu is not initialized
+    if (!novu) {
+      console.warn('Novu not initialized - missing environment variables');
+      return;
+    }
+
     async function fetchUnreadCount() {
       try {
         const result = await novu.notifications.count({
@@ -48,5 +53,9 @@ export function useUnreadCount() {
 }
 
 export async function markAllAsRead() {
+  if (!novu) {
+    console.warn('Novu not initialized - cannot mark notifications as read');
+    return;
+  }
   await novu.notifications.readAll({});
 }

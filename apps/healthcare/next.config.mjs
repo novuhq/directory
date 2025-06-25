@@ -9,6 +9,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Netlify specific settings
+  trailingSlash: true,
+  output: 'export',
+  distDir: 'out',
 };
 
 export default nextConfig;
