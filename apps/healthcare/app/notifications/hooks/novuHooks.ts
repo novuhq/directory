@@ -24,6 +24,11 @@ export function useUnreadCount() {
       return;
     }
 
+    // Only run in browser environment
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     async function fetchUnreadCount() {
       try {
         const result = await novu?.notifications.count({
@@ -57,5 +62,11 @@ export async function markAllAsRead() {
     console.warn('Novu not initialized - cannot mark notifications as read');
     return;
   }
+  
+  // Only run in browser environment
+  if (typeof window === 'undefined') {
+    return;
+  }
+  
   await novu.notifications.readAll({});
 }
