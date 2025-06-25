@@ -18,6 +18,10 @@ export function NovuInbox() {
 
   const tabs = [
     {
+      label: 'All',
+      filter: {},
+    },
+    {
       label: 'Messages',
       filter: { tags: ['Messages'] },
     },
