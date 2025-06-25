@@ -68,14 +68,14 @@ importers:
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.55.0(react@19.1.0))
       '@novu/js':
-        specifier: ^3.1.0
-        version: 3.2.0
+        specifier: ^3.5.0
+        version: 3.5.0
       '@novu/nextjs':
-        specifier: ^3.2.0
-        version: 3.2.0(next@15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^3.5.0
+        version: 3.5.0(next@15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@novu/react':
-        specifier: ^3.0.3
-        version: 3.2.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^3.5.0
+        version: 3.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-accordion':
         specifier: 1.2.2
         version: 1.2.2(@types/react-dom@19.1.1(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -893,6 +893,9 @@ packages:
   '@novu/js@3.2.0':
     resolution: {integrity: sha512-eA26MbQwQV25zZzOIOIQ2DV1Q+IUfu9Cw/BHv/pl7FzcFgFPdSPuKpxR8tt0UAMEzlZ7rs+AghMAtccIMGRAIw==}
 
+  '@novu/js@3.5.0':
+    resolution: {integrity: sha512-7m1PG+6xswsQj48nX+oYXtxZCUn6olZquwbYoqru9E4kA6TwFczjeLRcNvOP0iF2Y/UKwxfM/GXeXX+x7xX+zA==}
+
   '@novu/nextjs@3.2.0':
     resolution: {integrity: sha512-iKH/gjkTYgr4bjZ9rKVsFRWCUKwhvVPe8BmYKHhWpwnN5/NyTToDoR3vwYFEp8qKad3E4nI3obmJpYzeupqgbA==}
     peerDependencies:
@@ -903,8 +906,27 @@ packages:
       react-dom:
         optional: true
 
+  '@novu/nextjs@3.5.0':
+    resolution: {integrity: sha512-w8TmtNGrdJF5GBqKjYK+XpPkz61perP9BfgBSjh5TuqBJlSf2CmhNv/kiyQYLLrqgSWYELgrZIimscixUZFxmg==}
+    peerDependencies:
+      next: '>=13.5.2 || ^14.0.0 || ^15.0.0'
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+
   '@novu/react@3.2.0':
     resolution: {integrity: sha512-gghEWKxWjuLSbq09HVPiLqvTrToqwW7H6BXUHiHb3sTRZPQVx+nh3oPNY1rOpKqNw2e6OfEJNBFqxhuGe14yoA==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+
+  '@novu/react@3.5.0':
+    resolution: {integrity: sha512-/o5EVnO8+NpHUKvIlDJJ0PFtmisV0p+Aw4S2ceopYsoO7NdDRTaWIU3rBcDOrFdbNQOE+9IrOvDCpgElkskMVw==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
       react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
@@ -4564,6 +4586,22 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@novu/js@3.5.0':
+    dependencies:
+      '@floating-ui/dom': 1.6.13
+      class-variance-authority: 0.7.1
+      clsx: 2.1.1
+      mitt: 3.0.1
+      socket.io-client: 4.7.2
+      solid-floating-ui: 0.3.1(@floating-ui/dom@1.6.13)(solid-js@1.9.5)
+      solid-js: 1.9.5
+      solid-motionone: 1.0.3(solid-js@1.9.5)
+      tailwind-merge: 2.6.0
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@novu/nextjs@3.2.0(next@15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@novu/react': 3.2.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4576,9 +4614,32 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@novu/nextjs@3.5.0(next@15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@novu/react': 3.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react: 19.1.0
+    optionalDependencies:
+      react-dom: 19.1.0(react@19.1.0)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@novu/react@3.2.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@novu/js': 3.2.0
+      react: 19.1.0
+    optionalDependencies:
+      react-dom: 19.1.0(react@19.1.0)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@novu/react@3.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@novu/js': 3.5.0
       react: 19.1.0
     optionalDependencies:
       react-dom: 19.1.0(react@19.1.0)
