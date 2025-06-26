@@ -183,11 +183,62 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+Thank you for your interest in contributing! Here's how you can get started:
+
+### Guidelines
+
+- **Monorepo Structure:**  
+  This project uses a monorepo managed by pnpm workspaces. All apps and packages are located in the `apps/` and `packages/` directories, respectively.
+
+- **Shared Dependencies:**  
+  Common dependencies are managed centrally in `packages/shared-deps`.
+  - When adding a dependency used by multiple apps, add it to `packages/shared-deps/package.json`.
+  - For app-specific dependencies, add them to the respective app's `package.json`.
+
+- **Creating a New App:**  
+  1. Create a new folder under `apps/`.
+  2. Use the template `package.json` (see below) and always include `@directory/shared-deps` as a dependency.
+  3. Run `pnpm install` at the root to link dependencies.
+
+- **Scripts:**  
+  - `pnpm dev` — Start all apps in development mode.
+  - `pnpm build:all` — Build all apps.
+  - `pnpm lint` — Lint all apps.
+  - `pnpm update-novu` — Update Novu dependencies in the shared package.
+
+- **Pull Requests:**  
+  1. Fork the repository.
+  2. Create a feature branch.
+  3. Make your changes and add tests if applicable.
+  4. Run `pnpm lint` and `pnpm build:all` to ensure code quality.
+  5. Submit a pull request.
+
+### New App Template
+
+```json
+{
+  "name": "your-new-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@directory/shared-deps": "workspace:*",
+    "next": "15.2.4",
+    "react": "^19",
+    "react-dom": "^19"
+  }
+}
+```
+
+---
+
+**Questions?**  
+Open an issue or start a discussion in the repository.
 
 ## 📞 Support
 
