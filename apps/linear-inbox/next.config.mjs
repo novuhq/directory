@@ -25,6 +25,9 @@ const nextConfig = {
   output: 'export',
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
+  // Configure for subdirectory deployment
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/linear-inbox' : '',
+  basePath: process.env.NODE_ENV === 'production' ? '/linear-inbox' : '',
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,

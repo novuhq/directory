@@ -17,11 +17,6 @@
   to = "/linear-inbox/index.html"
   status = 200
 
-[[redirects]]
-  from = "/docs/*"
-  to = "/docs/index.html"
-  status = 200
-
 # Handle client-side routing
 [[redirects]]
   from = "/*"
