@@ -1,6 +1,6 @@
 [build]
   publish = "dist"
-  command = ""
+  command = "chmod +x build-static.sh && ./build-static.sh"
 
 [build.environment]
   NODE_VERSION = "18"

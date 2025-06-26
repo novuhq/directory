@@ -13,6 +13,12 @@ mkdir -p dist
 echo "Building healthcare app..."
 pnpm build --filter=healthcare-app
 
+# Verify healthcare out directory exists
+if [ ! -d "apps/healthcare/out" ]; then
+    echo "Error: Healthcare app out directory not found!"
+    exit 1
+fi
+
 # Copy healthcare app to dist
 echo "Copying healthcare app to dist..."
 cp -r apps/healthcare/out dist/healthcare
@@ -20,6 +26,12 @@ cp -r apps/healthcare/out dist/healthcare
 # Build the linear-inbox app
 echo "Building linear-inbox app..."
 pnpm build --filter=linear-inbox-app
+
+# Verify linear-inbox out directory exists
+if [ ! -d "apps/linear-inbox/out" ]; then
+    echo "Error: Linear-inbox app out directory not found!"
+    exit 1
+fi
 
 # Copy linear-inbox app to dist
 echo "Copying linear-inbox app to dist..."
