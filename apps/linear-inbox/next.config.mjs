@@ -22,6 +22,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  output: 'export',
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,

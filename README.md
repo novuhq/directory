@@ -1,84 +1,198 @@
-# Turborepo starter
+# Demo Project - Multiple Next.js Applications
 
-This Turborepo starter is maintained by the Turborepo core team.
+This is a comprehensive demo project showcasing multiple Next.js applications built with modern web technologies. The project demonstrates various real-world use cases and UI patterns.
 
-## Using this example
+## 🚀 Live Demo
 
-Run the following command:
+The demo is deployed on Netlify and includes multiple applications:
 
-```sh
-npx create-turbo@latest
-```
+- **Healthcare Dashboard** - A comprehensive healthcare management system
+- **Linear Inbox** - Project management inbox interface
+- **Documentation** - Technical documentation and guides
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## 🏗️ Project Structure
 
 ```
-cd my-turborepo
-pnpm build
+directory/
+├── apps/
+│   ├── healthcare/          # Healthcare management system
+│   ├── linear-inbox/        # Project management inbox
+│   ├── docs/               # Documentation site
+│   └── web/                # Web application
+├── packages/
+│   ├── ui/                 # Shared UI components
+│   ├── eslint-config/      # ESLint configuration
+│   └── typescript-config/  # TypeScript configuration
+└── components/             # Shared components
 ```
 
-### Develop
+## 🛠️ Technology Stack
 
-To develop all apps and packages, run the following command:
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Radix UI + Custom components
+- **Package Manager**: pnpm
+- **Build Tool**: Turbo (Monorepo)
+- **Deployment**: Netlify
 
-```
-cd my-turborepo
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18 or higher
+- pnpm 9.0.0 or higher
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd directory
+
+# Install dependencies
+pnpm install
+
+# Start development server
 pnpm dev
 ```
 
-### Remote Caching
+### Development
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+```bash
+# Start all apps in development mode
+pnpm dev
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+# Start specific app
+pnpm dev --filter=healthcare-app
+pnpm dev --filter=linear-inbox-app
+pnpm dev --filter=docs-app
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+# Build all apps
+pnpm build
 
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
+# Lint all apps
+pnpm lint
 ```
 
-## Useful Links
+## 📱 Applications
 
-Learn more about the power of Turborepo:
+### Healthcare Dashboard (`/healthcare`)
 
-- [Tasks](https://turbo.build/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/docs/reference/command-line-reference)
+A comprehensive healthcare management system featuring:
+
+- Patient dashboard with health metrics
+- Appointment scheduling and management
+- Medical records and history
+- Medication tracking
+- Notifications system
+- Preventive care reminders
+
+**Key Features:**
+- Real-time health metrics visualization
+- Interactive appointment calendar
+- Responsive design for mobile and desktop
+- Dark/light theme support
+
+### Linear Inbox (`/linear-inbox`)
+
+A project management inbox interface with:
+
+- Issue tracking and management
+- Team collaboration features
+- Notification preferences
+- Real-time updates
+- Customizable workflows
+
+**Key Features:**
+- Drag-and-drop issue management
+- Advanced filtering and search
+- Integration with external tools
+- Mobile-responsive design
+
+### Documentation (`/docs`)
+
+Technical documentation and guides including:
+
+- API documentation
+- Component library
+- Getting started guides
+- Best practices
+
+## 🚀 Deployment
+
+### Netlify Deployment
+
+This project is configured for automatic deployment on Netlify:
+
+1. **Connect Repository**: Link your GitHub repository to Netlify
+2. **Build Settings**:
+   - Build command: `./build-static.sh`
+   - Publish directory: `dist`
+   - Node version: 18
+
+3. **Environment Variables**: No additional environment variables required
+
+### Manual Deployment
+
+```bash
+# Build the project
+./build-static.sh
+
+# The built files will be in the `dist` directory
+# Deploy the `dist` directory to your hosting provider
+```
+
+### Build Process
+
+The build script (`build-static.sh`) performs the following steps:
+
+1. Installs all dependencies using pnpm
+2. Builds each Next.js application with static export
+3. Copies built files to a unified `dist` directory
+4. Creates a landing page for the demo
+5. Sets up proper routing for all applications
+
+## 🎨 Design System
+
+The project uses a comprehensive design system built with:
+
+- **Radix UI**: Accessible, unstyled UI components
+- **Tailwind CSS**: Utility-first CSS framework
+- **Custom Components**: Reusable components in `packages/ui`
+- **Theme Support**: Dark/light mode with next-themes
+
+## 📦 Package Management
+
+This project uses pnpm workspaces for efficient package management:
+
+- **Root dependencies**: Shared across all apps
+- **App-specific dependencies**: Scoped to individual applications
+- **Shared packages**: Reusable components and configurations
+
+## 🔧 Development Tools
+
+- **ESLint**: Code linting with custom configurations
+- **TypeScript**: Type safety across the entire project
+- **Prettier**: Code formatting
+- **Turbo**: Fast, incremental builds
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📞 Support
+
+For questions or support, please open an issue in the repository.
+
+---
+
+Built with ❤️ using Next.js, TypeScript, and Tailwind CSS
