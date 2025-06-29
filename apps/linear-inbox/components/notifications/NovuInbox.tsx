@@ -15,13 +15,9 @@ const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID as string;
 export function NovuInbox({
   handleNotificationClick,
 }: NovuInboxProps) {
-  // Debug logging
-  console.log("NovuInbox render - applicationIdentifier:", applicationIdentifier);
-  console.log("NovuInbox render - subscriberId:", subscriberId);
 
   // Check if environment variables are available
   if (!applicationIdentifier || !subscriberId) {
-    console.log("NovuInbox - Environment variables missing, showing fallback");
     return (
       <div className="flex flex-col h-full">
         <InboxHeader />
@@ -48,8 +44,6 @@ export function NovuInbox({
       </div>
     );
   }
-
-  console.log("NovuInbox - Environment variables found, rendering Novu component");
 
   const renderNotification = (notification: Notification) => {
     return (
@@ -82,4 +76,4 @@ export function NovuInbox({
       <InboxContent {...inboxContent} />
     </Inbox>
   );
-}
+} 

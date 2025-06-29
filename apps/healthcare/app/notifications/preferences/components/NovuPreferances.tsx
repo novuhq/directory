@@ -3,9 +3,12 @@
 import { Inbox, Preferences } from '@novu/react';
 
 export function NovuPreferences() {
+  const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
+  const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID;
+
   const inboxConfig = {
-    applicationIdentifier: '_EYlz4GL3-nL',
-    subscriberId: '625f3fe55a55980017dd63fd',
+    applicationIdentifier,
+    subscriberId,
     appearance: {
       elements: {
         preferencesContainer: {
@@ -72,6 +75,12 @@ export function NovuPreferences() {
       display: block !important;
     }
   `;
+
+  // Don't render if environment variables are not available
+  if (!applicationIdentifier || !subscriberId) {
+    console.warn('Novu not initialized - missing environment variables');
+    return null;
+  }
 
   return (
     <>
