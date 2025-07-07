@@ -3,22 +3,90 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
-import * as React from "react";
 
+import { cn } from "@/lib/utils";
+import { useState, useCallback, useEffect } from "react";
+import {
+  readAllNotifications,
+  archiveAllNotifications,
+} from "./hooks/novuHooks";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface InboxHeaderProps {
   className?: string;
+  onRefresh?: () => void;
+  subscriberId?: string;
+  showRead?: boolean;
+  showUnread?: boolean;
+  showSnoozed?: boolean;
+  onFiltersChange?: (filters: {
+    showRead: boolean;
+    showUnread: boolean;
+    showSnoozed: boolean;
+  }) => void;
 }
 
+// Local storage keys for filter persistence
+const FILTER_STORAGE_KEYS = {
+  SHOW_SNOOZED: "linear-inbox-show-snoozed",
+  SHOW_READ: "linear-inbox-show-read",
+  SHOW_UNREAD: "linear-inbox-show-unread",
+} as const;
+
+// Reusable Toggle Switch Component
+interface ToggleSwitchProps {
+  id: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  label: string;
+}
+
+const ToggleSwitch = ({
+  id,
+  checked,
+  onCheckedChange,
+  label,
+}: ToggleSwitchProps) => (
+  <div className="flex items-center justify-between">
+    <label className="text-sm font-medium text-foreground">{label}</label>
+    <div className="relative">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onCheckedChange(e.target.checked)}
+        className="sr-only"
+        id={id}
+      />
+      <label
+        htmlFor={id}
+        className={cn(
+          "block w-9 h-5 rounded-full cursor-pointer transition-colors duration-200 ease-in-out relative",
+          checked ? "bg-blue-600" : "bg-gray-200 hover:bg-gray-300"
+        )}
+      >
+        <span
+          className={cn(
+            "absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform duration-200 ease-in-out",
+            checked ? "translate-x-5" : "translate-x-0.5"
+          )}
+        />
+      </label>
+    </div>
+  </div>
+);
+
+// Icon components (keeping the same as original)
 const MoreIcon = () => (
   <svg
     width="16"
@@ -30,24 +98,6 @@ const MoreIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M3 6.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-  </svg>
-);
-
-const FilterIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="currentColor"
-    role="img"
-    focusable="false"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M14.25 3a.75.75 0 0 1 0 1.5H1.75a.75.75 0 0 1 0-1.5h12.5ZM4 8a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5A.75.75 0 0 1 4 8Zm2.75 3.5a.75.75 0 0 0 0 1.5h2.5a.75.75 0 0 0 0-1.5h-2.5Z"
-    />
   </svg>
 );
 
@@ -93,24 +143,6 @@ const DeleteIcon = () => (
   </svg>
 );
 
-const ArrowRightIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M6 12L10 8L6 4"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 const OrderingIcon = () => (
   <svg
     width="16"
@@ -120,6 +152,7 @@ const OrderingIcon = () => (
     role="img"
     focusable="false"
     xmlns="http://www.w3.org/2000/svg"
+    className="text-muted-foreground"
   >
     <path
       fillRule="evenodd"
@@ -134,513 +167,338 @@ const OrderingIcon = () => (
   </svg>
 );
 
-const defaultFilterOptions = [
-  {
-    label: "Notification type",
-    icon: (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M1 5.25C1 2.90279 2.90279 1 5.25 1H7.25C7.66421 1 8 1.33579 8 1.75C8 2.16421 7.66421 2.5 7.25 2.5H5.25C3.73122 2.5 2.5 3.73122 2.5 5.25V10.75C2.5 12.2688 3.73122 13.5 5.25 13.5H10.75C12.2688 13.5 13.5 12.2688 13.5 10.75V8.75287C13.5 8.33865 13.8358 8.00287 14.25 8.00287C14.6642 8.00287 15 8.33865 15 8.75287V10.75C15 13.0972 13.0972 15 10.75 15H5.25C2.90279 15 1 13.0972 1 10.75V5.25Z"
-        ></path>
-        <path d="M15 3.5C15 4.88071 13.8807 6 12.5 6C11.1193 6 10 4.88071 10 3.5C10 2.11929 11.1193 1 12.5 1C13.8807 1 15 2.11929 15 3.5Z"></path>
-      </svg>
-    ),
-    options: [
-      { label: "All notifications", count: 0, icon: null },
-      { label: "Assignments", count: 0, icon: null },
-      { label: "Comments and replies", count: 0, icon: null },
-      { label: "Document changes", count: 0, icon: null },
-      { label: "Mentions", count: 0, icon: null },
-      { label: "Reminders and deadlines", count: 0, icon: null },
-      { label: "Status changes", count: 0, icon: null },
-      { label: "Project updates", count: 0, icon: null },
-      { label: "Team mentions", count: 0, icon: null },
-      { label: "Issue updates", count: 0, icon: null },
-    ] as Array<{ label: string; count: number; icon: React.ReactNode | null }>,
-  },
-  {
-    label: "Subscription",
-    icon: (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d="M6 13h4a2 2 0 0 1-3.995.15L6 13h4-4ZM8 1a4 4 0 0 1 4 4v3.03l1.684 1.578a1 1 0 0 1 .316.73V11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-.662a1 1 0 0 1 .316-.73L4 8.03V5a4 4 0 0 1 4-4Z"></path>
-      </svg>
-    ),
-    options: [
-      { label: "All subscriptions", count: 0 },
-      { label: "Watching", count: 0 },
-      { label: "Participating", count: 0 },
-      { label: "Mentioned", count: 0 },
-      { label: "Team mentions", count: 0 },
-      { label: "Custom", count: 0 },
-    ],
-  },
-  {
-    label: "Team",
-    icon: (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d="M10.5 6.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM8 10c2.338 0 3.6.475 3.972 1.424a.43.43 0 0 1 .028.157.419.419 0 0 1-.419.419H4.419A.419.419 0 0 1 4 11.581a.43.43 0 0 1 .028-.157C4.399 10.474 5.662 10 8 10Z"></path>
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M1 5.8c0-1.68 0-2.52.327-3.162a3 3 0 0 1 1.311-1.311C3.28 1 4.12 1 5.8 1h4.4c1.68 0 2.52 0 3.162.327a3 3 0 0 1 1.311 1.311C15 3.28 15 4.12 15 5.8v4.4c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C12.72 15 11.88 15 10.2 15H5.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C1 12.72 1 11.88 1 10.2V5.8Zm4.8-3.3h4.4c.865 0 1.423.001 1.848.036.408.033.559.09.633.127a1.5 1.5 0 0 1 .655.656c.038.074.095.225.128.633.035.425.036.983.036 1.848v4.4c0 .865-.001 1.423-.036 1.848-.033.408-.09.559-.128.633a1.5 1.5 0 0 1-.655.655c-.074.038-.225.095-.633.128-.425.035-.983.036-1.848.036H5.8c-.865 0-1.423-.001-1.848-.036-.408-.033-.559-.09-.633-.128a1.5 1.5 0 0 1 .656-.656c.074-.037.225-.094.633-.127C4.377 2.5 4.935 2.5 5.8 2.5Z"
-        ></path>
-      </svg>
-    ),
-    options: [
-      { label: "All teams", count: 0 },
-      { label: "Engineering", count: 0 },
-      { label: "Design", count: 0 },
-      { label: "Product", count: 0 },
-      { label: "Marketing", count: 0 },
-      { label: "Sales", count: 0 },
-      { label: "Support", count: 0 },
-    ],
-  },
-  {
-    label: "Project",
-    icon: (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fillRule="evenodd"
-          d="m11.927 13.232-1.354.78c-.937.54-1.406.811-1.904.917a3.22 3.22 0 0 1-1.338 0c-.498-.106-.967-.376-1.904-.917l-1.354-.78c-.937-.541-1.406-.811-1.747-1.19a3.212 3.212 0 0 1-.669-1.157C1.5 10.401 1.5 9.861 1.5 8.78V7.22c0-1.082 0-1.622.157-2.106.14-.429.368-.823.67-1.157.34-.379.809-.649 1.746-1.19l1.354-.78c.937-.54 1.406-.811 1.904-.917a3.22 3.22 0 0 1 1.338 0c.498.106.967.376 1.904.917l1.354.78c.937.541 1.406.811 1.747 1.19.301.334.53.728.669 1.157.157.484.157 1.024.157 2.106v1.56c0 1.082 0 1.622-.157 2.106-.14.429-.368.823-.67 1.157-.34.379-.809.649-1.746 1.19Zm-5.751-.52-1.353-.78c-1.025-.591-1.239-.734-1.383-.894a1.712 1.712 0 0 1-.356-.617C3.017 10.217 3 9.962 3 8.78V7.22c0-.378.002-.661.006-.878l3.021 1.51a2.25 2.25 0 0 1 1.224 2.002v3.457a23.16 23.16 0 0 1-1.075-.597Zm2.575.597c.212-.105.532-.284 1.073-.596l1.353-.78c1.026-.592 1.239-.735 1.383-.895.16-.178.282-.389.356-.617.066-.204.084-.459.084-1.642V7.22c0-.378-.002-.661-.006-.878l-3 1.5-.007.003a2.25 2.25 0 0 0-1.236 2.009v3.456Zm3.757-8.402L9.324 6.499l-.01.004-.307.154a2.25 2.25 0 0 1-2.013 0l-.29-.145-.026-.013-3.186-1.593c.15-.143.42-.315 1.33-.84l1.354-.78c1.025-.592 1.256-.705 1.467-.75.235-.05.479-.05.714 0 .211.045.442.158 1.467.75l1.353.78c.912.525 1.181.697 1.331.84Z"
-        ></path>
-      </svg>
-    ),
-    options: [
-      { label: "All projects", count: 0 },
-      { label: "Web App", count: 0 },
-      { label: "Mobile App", count: 0 },
-      { label: "API", count: 0 },
-      { label: "Documentation", count: 0 },
-      { label: "Infrastructure", count: 0 },
-      { label: "Design System", count: 0 },
-    ],
-  },
-  {
-    label: "Initiative",
-    icon: (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d="M8 2.5a5.5 5.5 0 0 0-5.213 7.26.75.75 0 0 1-1.42.48 7 7 0 1 1 13.268 0 .75.75 0 0 1-1.423-.48A5.5 5.5 0 0 0 8 2.5Z"></path>
-        <path d="m3.617 13.771 3.724-6.385a.755.755 0 0 1 1.318 0l3.724 6.385c.408.7-.33 1.515-1.022 1.13l-3.24-1.805a.248.248 0 0 0-.242 0l-3.24 1.805c-.693.385-1.43-.43-1.022-1.13Z"></path>
-      </svg>
-    ),
-    options: [
-      { label: "All initiatives", count: 0 },
-      { label: "Q1 Goals", count: 0 },
-      { label: "Q2 Goals", count: 0 },
-      { label: "Q3 Goals", count: 0 },
-      { label: "Q4 Goals", count: 0 },
-      { label: "Annual Goals", count: 0 },
-      { label: "Strategic Projects", count: 0 },
-    ],
-  },
-  {
-    label: "Issue priority",
-    icon: (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect x="1" y="8" width="3" height="6" rx="1"></rect>
-        <rect x="6" y="5" width="3" height="9" rx="1"></rect>
-        <rect x="11" y="2" width="3" height="12" rx="1"></rect>
-      </svg>
-    ),
-    options: [
-      { label: "All priorities", count: 0 },
-      { label: "Urgent", count: 0 },
-      { label: "High", count: 0 },
-      { label: "Medium", count: 0 },
-      { label: "Low", count: 0 },
-      { label: "No priority", count: 0 },
-    ],
-  },
-  {
-    label: "Issue status",
-    icon: (
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect
-          x="1"
-          y="1"
-          width="12"
-          height="12"
-          rx="6"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          fill="none"
-        ></rect>
-        <path
-          fill="currentColor"
-          stroke="none"
-          d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 0 z"
-          transform="translate(3.5,3.5)"
-        ></path>
-      </svg>
-    ),
-    options: [
-      { label: "All statuses", count: 0 },
-      { label: "Backlog", count: 0 },
-      { label: "Todo", count: 0 },
-      { label: "In Progress", count: 0 },
-      { label: "In Review", count: 0 },
-      { label: "Done", count: 0 },
-      { label: "Cancelled", count: 0 },
-    ],
-  },
-  {
-    label: "Date range",
-    icon: (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d="M4 1.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1.5h-8V1.5Z"></path>
-        <path d="M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-10Z"></path>
-        <path d="M4 6.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1.5h-8V6.5Z"></path>
-      </svg>
-    ),
-    options: [
-      { label: "All time", count: 0 },
-      { label: "Today", count: 0 },
-      { label: "Yesterday", count: 0 },
-      { label: "Last 7 days", count: 0 },
-      { label: "Last 30 days", count: 0 },
-      { label: "Last 90 days", count: 0 },
-      { label: "Custom range", count: 0 },
-    ],
-  },
-];
-
 export function InboxHeader({
   className,
-  filterOptions = defaultFilterOptions,
-}: InboxHeaderProps & { filterOptions?: typeof defaultFilterOptions }) {
-  const [showSnoozed, setShowSnoozed] = React.useState(true);
-  const [showRead, setShowRead] = React.useState(true);
-  const [showUnreadFirst, setShowUnreadFirst] = React.useState(true);
-  const [ordering, setOrdering] = React.useState("movedToInboxAt");
-  const [displayProperties, setDisplayProperties] = React.useState([
-    "id",
-    "status",
-  ]);
-  const [checkedFilters, setCheckedFilters] = React.useState(() => {
-    const state: Record<string, Record<string, boolean>> = {};
-    (filterOptions || []).forEach((group) => {
-      state[group.label] = {};
-      (group.options || []).forEach((opt) => {
-        state[group.label][opt.label] = false;
-      });
-    });
-    return state;
-  });
+  onRefresh,
+  showRead: propShowRead,
+  showUnread: propShowUnread,
+  showSnoozed: propShowSnoozed,
+  onFiltersChange,
+}: InboxHeaderProps) {
+  const { toast } = useToast();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [ordering, setOrdering] = useState("movedToInboxAt");
+  const [isMarkingAllAsRead, setIsMarkingAllAsRead] = useState(false);
+  const [isArchivingAll, setIsArchivingAll] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
 
-  const toggleDisplayProperty = (property: string) => {
-    setDisplayProperties((prev) =>
-      prev.includes(property)
-        ? prev.filter((p) => p !== property)
-        : [...prev, property],
-    );
+  // Filter states with localStorage persistence
+  const [showSnoozed, setShowSnoozed] = useState(propShowSnoozed ?? false);
+  const [showRead, setShowRead] = useState(propShowRead ?? true);
+  const [showUnread, setShowUnread] = useState(propShowUnread ?? true);
+
+  // Load filter states from localStorage on component mount
+  useEffect(() => {
+    if (propShowSnoozed === undefined) {
+      try {
+        const storedShowSnoozed = localStorage.getItem(
+          FILTER_STORAGE_KEYS.SHOW_SNOOZED
+        );
+        if (storedShowSnoozed !== null) {
+          setShowSnoozed(JSON.parse(storedShowSnoozed));
+        }
+      } catch (error) {
+        console.error("Failed to load showSnoozed from localStorage:", error);
+      }
+    }
+  }, [propShowSnoozed]);
+
+  useEffect(() => {
+    if (propShowRead === undefined) {
+      try {
+        const storedShowRead = localStorage.getItem(
+          FILTER_STORAGE_KEYS.SHOW_READ
+        );
+        if (storedShowRead !== null) {
+          setShowRead(JSON.parse(storedShowRead));
+        }
+      } catch (error) {
+        console.error("Failed to load showRead from localStorage:", error);
+      }
+    }
+  }, [propShowRead]);
+
+  useEffect(() => {
+    if (propShowUnread === undefined) {
+      try {
+        const storedShowUnread = localStorage.getItem(
+          FILTER_STORAGE_KEYS.SHOW_UNREAD
+        );
+        if (storedShowUnread !== null) {
+          setShowUnread(JSON.parse(storedShowUnread));
+        }
+      } catch (error) {
+        console.error("Failed to load showUnread from localStorage:", error);
+      }
+    }
+  }, [propShowUnread]);
+
+  // Update local state when props change
+  useEffect(() => {
+    if (propShowSnoozed !== undefined) setShowSnoozed(propShowSnoozed);
+  }, [propShowSnoozed]);
+
+  useEffect(() => {
+    if (propShowRead !== undefined) setShowRead(propShowRead);
+  }, [propShowRead]);
+
+  useEffect(() => {
+    if (propShowUnread !== undefined) setShowUnread(propShowUnread);
+  }, [propShowUnread]);
+
+  // Filter change handlers
+  const handleShowSnoozedChange = useCallback(
+    (show: boolean) => {
+      setShowSnoozed(show);
+      try {
+        localStorage.setItem(
+          FILTER_STORAGE_KEYS.SHOW_SNOOZED,
+          JSON.stringify(show)
+        );
+      } catch (error) {
+        console.error("Failed to save showSnoozed to localStorage:", error);
+      }
+      onFiltersChange?.({ showRead, showUnread, showSnoozed: show });
+    },
+    [showRead, showUnread, onFiltersChange]
+  );
+
+  const handleShowReadChange = useCallback(
+    (show: boolean) => {
+      setShowRead(show);
+      try {
+        localStorage.setItem(
+          FILTER_STORAGE_KEYS.SHOW_READ,
+          JSON.stringify(show)
+        );
+      } catch (error) {
+        console.error("Failed to save showRead to localStorage:", error);
+      }
+      onFiltersChange?.({ showRead: show, showUnread, showSnoozed });
+    },
+    [showUnread, showSnoozed, onFiltersChange]
+  );
+
+  const handleShowUnreadChange = useCallback(
+    (show: boolean) => {
+      setShowUnread(show);
+      try {
+        localStorage.setItem(
+          FILTER_STORAGE_KEYS.SHOW_UNREAD,
+          JSON.stringify(show)
+        );
+      } catch (error) {
+        console.error("Failed to save showUnread to localStorage:", error);
+      }
+      onFiltersChange?.({ showRead, showUnread: show, showSnoozed });
+    },
+    [showRead, showSnoozed, onFiltersChange]
+  );
+
+  const handleMarkAllAsRead = async () => {
+    setIsMarkingAllAsRead(true);
+    try {
+      const result = await readAllNotifications();
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "All notifications have been marked as read.",
+        });
+        onRefresh?.();
+      } else {
+        throw result.error || new Error("Failed to mark all as read");
+      }
+    } catch (error) {
+      console.error("Failed to mark all as read:", error);
+      toast({
+        title: "Error",
+        description: "Failed to mark all notifications as read.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsMarkingAllAsRead(false);
+    }
   };
 
-  const handleSubOptionToggle = (groupLabel: string, optionLabel: string) => {
-    setCheckedFilters((prev) => ({
-      ...prev,
-      [groupLabel]: {
-        ...prev[groupLabel],
-        [optionLabel]: !prev[groupLabel][optionLabel],
-      },
-    }));
+  const handleArchiveAllNotifications = async () => {
+    setIsArchivingAll(true);
+    try {
+      const result = await archiveAllNotifications();
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "All notifications have been archived.",
+        });
+        onRefresh?.();
+      } else {
+        throw result.error || new Error("Failed to archive all notifications");
+      }
+    } catch (error) {
+      console.error("Failed to archive all notifications:", error);
+      toast({
+        title: "Error",
+        description: "Failed to archive all notifications.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsArchivingAll(false);
+      setShowArchiveConfirm(false);
+    }
   };
 
   return (
-    <header
-      className={cn(
-        "flex items-center justify-between px-4 py-4 border-b",
-        className,
-      )}
-    >
-      <div className="flex items-center gap-2">
-        <div className="flex items-center">
-          <h2 className="text-md font-medium text-muted-foreground">Inbox</h2>
-        </div>
-        <div className="flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 hover:bg-transparent text-muted-foreground"
-                aria-label="Notification actions"
+    <>
+      <AlertDialog
+        open={showArchiveConfirm}
+        onOpenChange={setShowArchiveConfirm}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Archive all notifications</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently archive all
+              your notifications.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleArchiveAllNotifications}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Archive All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <header
+        className={cn(
+          "flex items-center justify-between px-4 py-4 border-b",
+          className
+        )}
+      >
+        <div className="flex items-center gap-2">
+          <div className="flex items-center">
+            <h2 className="text-md font-medium text-muted-foreground">Inbox</h2>
+          </div>
+          <div className="flex items-center">
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-transparent text-muted-foreground border-0 focus:border-0 focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-0 active:border-0 active:ring-0 focus:outline-none focus-visible:outline-none focus-within:outline-none focus-within:ring-0 focus-within:border-0"
+                  aria-label="Notification actions"
+                >
+                  <MoreIcon />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="min-w-[302px] p-1.5"
               >
-                <MoreIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[302px] p-1.5">
-              <button className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium">
-                <MarkAllReadIcon />
-                <span className="ml-3 flex-1 text-left">Mark all as read</span>
-                <span className="flex gap-0.5 text-xs text-muted-foreground">
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                    ⌥
-                  </kbd>
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                    U
-                  </kbd>
-                </span>
-              </button>
-              <div className="my-1 h-px bg-border" />
-              <button className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium">
-                <DeleteIcon />
-                <span className="ml-3 flex-1 text-left">
-                  Delete all notifications
-                </span>
-              </button>
-              <button className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium">
-                <DeleteIcon />
-                <span className="ml-3 flex-1 text-left">
-                  Delete all read notifications
-                </span>
-                <span className="flex gap-0.5 text-xs text-muted-foreground">
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                    ⇧
-                  </kbd>
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                    ⌫
-                  </kbd>
-                </span>
-              </button>
-              <button className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium">
-                <DeleteIcon />
-                <span className="ml-3 flex-1 text-left">
-                  Delete notifications for completed issues
-                </span>
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <button
+                  className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    handleMarkAllAsRead();
+                  }}
+                  disabled={isMarkingAllAsRead}
+                >
+                  <MarkAllReadIcon />
+                  <span className="ml-3 flex-1 text-left">
+                    {isMarkingAllAsRead
+                      ? "Marking all as read..."
+                      : "Mark all as read"}
+                  </span>
+                  <span className="flex gap-0.5 text-xs text-muted-foreground">
+                    <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+                      ⌥
+                    </kbd>
+                    <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+                      U
+                    </kbd>
+                  </span>
+                </button>
+                <div className="my-1 h-px bg-border" />
+                <button
+                  className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    setShowArchiveConfirm(true);
+                  }}
+                  disabled={isArchivingAll}
+                >
+                  <DeleteIcon />
+                  <span className="ml-3 flex-1 text-left">
+                    {isArchivingAll
+                      ? "Archiving all notifications..."
+                      : "Archive all notifications"}
+                  </span>
+                </button>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="flex items-center">
+
+        <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 hover:bg-transparent text-muted-foreground"
+                className="h-7 w-7 hover:bg-transparent text-muted-foreground border-0 focus:border-0 focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-0 active:border-0 active:ring-0 focus:outline-none focus-visible:outline-none focus-within:outline-none focus-within:ring-0 focus-within:border-0"
                 aria-label="Display options"
               >
                 <DisplayIcon />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 p-1.5">
-              <div className="flex items-center justify-between py-0.5 px-1.5">
-                <span className="text-xs">Show snoozed</span>
-                <Switch
-                  checked={showSnoozed}
-                  onCheckedChange={setShowSnoozed}
-                  className="h-4 w-7"
-                />
-              </div>
-              <div className="flex items-center justify-between py-0.5 px-1.5">
-                <span className="text-xs">Show read</span>
-                <Switch
-                  checked={showRead}
-                  onCheckedChange={setShowRead}
-                  className="h-4 w-7"
-                />
-              </div>
-              <div className="flex items-center justify-between py-0.5 px-1.5">
-                <span className="text-xs">Show unread first</span>
-                <Switch
-                  checked={showUnreadFirst}
-                  onCheckedChange={setShowUnreadFirst}
-                  className="h-4 w-7"
-                />
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="pt-0.5 pb-1 text-xs">
-                Display properties
-              </DropdownMenuLabel>
-              <div className="flex gap-1 px-1.5 pb-1">
-                <button
-                  type="button"
-                  className={cn(
-                    "px-2 py-0.5 rounded-md border text-[11px] font-medium transition",
-                    displayProperties.includes("id")
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background text-foreground border-input",
-                  )}
-                  onClick={() => toggleDisplayProperty("id")}
-                >
-                  ID
-                </button>
-                <button
-                  type="button"
-                  className={cn(
-                    "px-2 py-0.5 rounded-md border text-[11px] font-medium transition",
-                    displayProperties.includes("status")
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background text-foreground border-input",
-                  )}
-                  onClick={() => toggleDisplayProperty("status")}
-                >
-                  Status and icon
-                </button>
-              </div>
-              <DropdownMenuSeparator />
-              <div className="flex flex-col gap-1 px-1.5 py-0.5">
-                <div className="flex items-center gap-1">
-                  <OrderingIcon />
-                  <span className="text-xs">Ordering</span>
+            <DropdownMenuContent align="end" className="w-64 p-3">
+              {/* Ordering Section */}
+              <div className="mb-4">
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 text-sm font-medium text-foreground whitespace-nowrap">
+                    <OrderingIcon />
+                    Ordering
+                  </label>
+                  <select
+                    value={ordering}
+                    onChange={(e) => setOrdering(e.target.value)}
+                    className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="movedToInboxAt">Newest</option>
+                    <option value="reverseMovedToInboxAt">Oldest</option>
+                    <option value="priority">Priority</option>
+                  </select>
                 </div>
-                <select
-                  value={ordering}
-                  onChange={(e) => setOrdering(e.target.value)}
-                  className="w-full rounded border px-1 py-0.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="movedToInboxAt">Newest</option>
-                  <option value="reverseMovedToInboxAt">Oldest</option>
-                  <option value="priority">Priority</option>
-                </select>
               </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <div className="flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 hover:bg-transparent text-muted-foreground"
-                aria-label="Add filter"
-              >
-                <FilterIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[206px] p-2">
-              <form
-                autoComplete="off"
-                className="mb-2 flex items-center gap-2 px-1"
-              >
-                <input
-                  type="text"
-                  placeholder="Filter notifications by…"
-                  className="flex-1 rounded border px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
-                  aria-label="Filter notifications by…"
+
+              {/* Switch Toggles Section */}
+              <div className="mb-4 space-y-3">
+                <ToggleSwitch
+                  id="showSnoozed"
+                  checked={showSnoozed}
+                  onCheckedChange={handleShowSnoozedChange}
+                  label="Show snoozed"
                 />
-                <span className="text-xs text-muted-foreground">
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                    F
-                  </kbd>
-                </span>
-              </form>
-              <div className="max-h-48 overflow-auto">
-                {(filterOptions || []).map((option) => (
-                  <DropdownMenuSub key={option.label}>
-                    <DropdownMenuSubTrigger className="flex items-center w-full px-2 py-2 rounded-md hover:bg-accent focus:bg-accent group text-sm font-medium">
-                      <span className="flex items-center justify-center w-5 h-5">
-                        {option.icon}
-                      </span>
-                      <span className="ml-3 flex-1 text-left">
-                        {option.label}
-                      </span>
-                      <span className="ml-auto text-xs text-muted-foreground">
-                        <ArrowRightIcon />
-                      </span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="min-w-[297px] p-2">
-                      <form
-                        autoComplete="off"
-                        className="mb-2 flex items-center gap-2 px-1"
-                      >
-                        <input
-                          type="text"
-                          placeholder="Filter…"
-                          className="flex-1 rounded border px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
-                          aria-label="Filter…"
-                        />
-                      </form>
-                      <div className="max-h-52 overflow-auto">
-                        {(option.options || []).map((sub) => (
-                          <DropdownMenuCheckboxItem
-                            key={sub.label}
-                            checked={
-                              checkedFilters[option.label]?.[sub.label] || false
-                            }
-                            onCheckedChange={() =>
-                              handleSubOptionToggle(option.label, sub.label)
-                            }
-                            className="flex items-center gap-2 px-2 py-2 rounded-md text-sm font-medium"
-                          >
-                            {"icon" in sub && sub.icon ? (
-                              <span className="flex items-center justify-center w-5 h-5">
-                                {sub.icon}
-                              </span>
-                            ) : null}
-                            <span className="ml-1 flex-1 text-left">
-                              {sub.label}
-                            </span>
-                            {typeof sub.count === "number" && (
-                              <span className="ml-auto text-xs text-muted-foreground whitespace-nowrap">
-                                {sub.count} notifications
-                              </span>
-                            )}
-                          </DropdownMenuCheckboxItem>
-                        ))}
-                      </div>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                ))}
+                <ToggleSwitch
+                  id="showRead"
+                  checked={showRead}
+                  onCheckedChange={handleShowReadChange}
+                  label="Show read"
+                />
+                <ToggleSwitch
+                  id="showUnread"
+                  checked={showUnread}
+                  onCheckedChange={handleShowUnreadChange}
+                  label="Show unread"
+                />
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

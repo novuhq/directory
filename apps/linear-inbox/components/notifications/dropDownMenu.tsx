@@ -1,4 +1,3 @@
-import React from "react";
 import {
   ContextMenuContent,
   ContextMenuItem,
@@ -6,11 +5,12 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 
-import { Notification } from "@novu/js";
+import { Notification } from "@novu/nextjs";
 import {
   unreadNotification,
   readNotification,
   archiveNotification,
+  snoozeNotificationWithOptions,
 } from "./hooks/novuHooks";
 
 import { useToast } from "@/components/ui/use-toast";
@@ -35,6 +35,7 @@ interface NotificationContextMenuProps {
   onCopy: () => void;
   onOpenInDesktop: () => void;
   isReadOverride?: boolean;
+  subscriberId?: string;
 }
 
 // Component for notification context menu
@@ -49,6 +50,7 @@ export const NotificationContextMenu = ({
   onFavorite,
   onCopy,
   onOpenInDesktop,
+  subscriberId,
 }: NotificationContextMenuProps) => {
   const { toast } = useToast();
 
@@ -87,6 +89,13 @@ export const NotificationContextMenu = ({
     }
   };
 
+  const handleSnooze = async (
+    option: "anHourFromNow" | "tomorrow" | "nextWeek"
+  ) => {
+    await snoozeNotificationWithOptions(notification, option);
+    onSnooze();
+  };
+
   return (
     <ContextMenuContent className="w-64">
       {!isReadOverride ? (
@@ -113,7 +122,10 @@ export const NotificationContextMenu = ({
         Delete notification
       </ContextMenuItem>
 
-      <ContextMenuItem className="gap-3" onClick={onSnooze} disabled>
+      <ContextMenuItem
+        className="gap-3"
+        onClick={() => handleSnooze("anHourFromNow")}
+      >
         <Clock className="h-4 w-4" />
         Snooze
         <ContextMenuShortcut>H</ContextMenuShortcut>

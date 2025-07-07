@@ -1,14 +1,35 @@
 'use client';
 
-import { Inbox, Preferences } from '@novu/react';
+import { Inbox } from '@novu/nextjs';
+import { useNovuSubscriber } from '../../hooks/useNovuSubscriber';
+
+const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
 
 export function NovuPreferences() {
-  const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
-  const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID;
+  const { subscriberId, isLoading, hasSubscriber } = useNovuSubscriber();
+
+  // Show loading state while subscriber ID is being determined
+  if (isLoading) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        <p>Loading preferences...</p>
+      </div>
+    );
+  }
+
+  // Show message if no subscriber ID is available
+  if (!hasSubscriber) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        <p>No subscriber ID available</p>
+        <p className="text-sm">Please refresh the page to initialize preferences</p>
+      </div>
+    );
+  }
 
   const inboxConfig = {
     applicationIdentifier,
-    subscriberId,
+    subscriberId: subscriberId!,
     appearance: {
       elements: {
         preferencesContainer: {
@@ -76,17 +97,14 @@ export function NovuPreferences() {
     }
   `;
 
-  // Don't render if environment variables are not available
-  if (!applicationIdentifier || !subscriberId) {
-    console.warn('Novu not initialized - missing environment variables');
-    return null;
-  }
-
   return (
     <>
       <style>{overrideStyles}</style>
       <Inbox {...inboxConfig}>
-        <Preferences />
+        <div className="p-4 text-center text-gray-500">
+          <p>Preferences component not available</p>
+          <p className="text-sm">Please use the Novu dashboard to manage preferences</p>
+        </div>
       </Inbox>
     </>
   );

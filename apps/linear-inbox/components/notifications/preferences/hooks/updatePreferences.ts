@@ -1,22 +1,71 @@
-// hooks/useWorkflowChannelPreferences.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { updateNotificationPreference, getNotificationPreferences } from "../../hooks/novuHooks";
 
-// Mock data for preferences
+// Type definition for Novu preference
+interface NovuPreference {
+  type: string;
+  channels: {
+    email?: boolean;
+    inApp?: boolean;
+    push?: boolean;
+    sms?: boolean;
+    chat?: boolean;
+    [key: string]: boolean | undefined;
+  };
+  [key: string]: unknown;
+}
+
+// Mock data for preferences (fallback)
 const mockPreferences = [
   {
-    workflow: { id: "workflow1" },
+    workflow: { id: "linear-updates" },
     channels: { email: true, inApp: true, push: false },
   },
   {
-    workflow: { id: "workflow2" },
-    channels: { email: true, inApp: false, push: true },
+    workflow: { id: "invite-notifications" },
+    channels: { email: true, inApp: true, push: false },
+  },
+  {
+    workflow: { id: "legal-updates" },
+    channels: { email: true, inApp: false, push: false },
   },
 ];
 
+type WorkflowPreference = {
+  workflow: { id: string };
+  channels: { [key: string]: boolean };
+};
+
 export function useWorkflowChannelPreferences() {
-  const [preferences, setPreferences] = useState(mockPreferences);
+  const [preferences, setPreferences] = useState<WorkflowPreference[]>(mockPreferences);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // Load preferences from Novu on component mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        setIsLoading(true);
+        const novuPreferences = await getNotificationPreferences();
+        
+        // Transform Novu preferences to our format
+        const transformedPreferences = (novuPreferences as NovuPreference[]).map((pref) => ({
+          workflow: { id: pref.type },
+          channels: pref.channels as { [key: string]: boolean },
+        }));
+        
+        setPreferences(transformedPreferences);
+      } catch (err) {
+        // Failed to load preferences from Novu, using mock data
+        // Keep using mock preferences if Novu fails
+        setPreferences(mockPreferences);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPreferences();
+  }, []);
 
   // Get a workflow by ID
   const getWorkflowPreference = (workflowId: string) => {
@@ -37,8 +86,12 @@ export function useWorkflowChannelPreferences() {
   ) => {
     try {
       setIsLoading(true);
+      setError(null);
 
-      // Find the preference to update
+      // Update preference in Novu
+      await updateNotificationPreference(workflowId, channelType, enabled);
+
+      // Find the preference to update locally
       const preferenceIndex = preferences.findIndex(
         (pref) => pref.workflow?.id === workflowId,
       );
@@ -56,15 +109,16 @@ export function useWorkflowChannelPreferences() {
 
         // Update the state
         setPreferences(updatedPreferences);
-
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        return true;
       } else {
-        console.error(`Workflow with ID ${workflowId} not found`);
-        return false;
+        // If workflow doesn't exist, create it
+        const newPreference = {
+          workflow: { id: workflowId },
+          channels: { [channelType]: enabled },
+        };
+        setPreferences([...preferences, newPreference]);
       }
+
+      return true;
     } catch (error) {
       console.error(`Failed to update ${channelType} preference:`, error);
       setError(error instanceof Error ? error : new Error(String(error)));
@@ -74,16 +128,23 @@ export function useWorkflowChannelPreferences() {
     }
   };
 
-  // Refetch preferences (simulated)
+  // Refetch preferences from Novu
   const refetch = async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      // In a real implementation, you would fetch from an API
-      setPreferences(mockPreferences);
+      const novuPreferences = await getNotificationPreferences();
+      
+      // Transform Novu preferences to our format
+      const transformedPreferences = (novuPreferences as NovuPreference[]).map((pref) => ({
+        workflow: { id: pref.type },
+        channels: pref.channels as { [key: string]: boolean },
+      }));
+      
+      setPreferences(transformedPreferences);
     } catch (error) {
       setError(error instanceof Error ? error : new Error(String(error)));
+      // Keep current preferences if refetch fails
     } finally {
       setIsLoading(false);
     }

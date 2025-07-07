@@ -65,9 +65,9 @@ export default function MobileNotificationsPage() {
           description="Set your quiet hours time range"
           defaultStartTime="22:00"
           defaultEndTime="07:00"
-          onChange={(start, end) =>
-            console.log(`Quiet hours: ${start} to ${end}`)
-          }
+          onChange={(start, end) => {
+            // Handle quiet hours change
+          }}
           hasBorder={false}
         />
       </NotificationCard>

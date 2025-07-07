@@ -1,37 +1,101 @@
 import { Novu, Notification } from "@novu/js";
+import { getSubscriberId } from "@/lib/subscriberUtils";
+ 
+const novu = new Novu({
+  subscriberId: getSubscriberId(),
+  applicationIdentifier: process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER as string,
+});
 
-const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID;
-const applicationIdentifier =
-  process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
+interface NovuResponse {
+  success: boolean;
+  error?: string;
+  data?: any;
+}
 
-// Only create Novu instance if environment variables are available
-const novu = subscriberId && applicationIdentifier 
-  ? new Novu({
-      subscriberId: subscriberId,
-      applicationIdentifier: applicationIdentifier,
-    })
-  : null;
-
-export const readNotification = async (notification: Notification) => {
-  if (!novu) {
-    console.warn("Novu not configured - cannot read notification");
-    return;
+export const readNotification = async (notification: Notification): Promise<NovuResponse> => {
+  try {
+    await novu.notifications.read({ notificationId: notification.id });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to read notification:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
-  await novu.notifications.read({ notificationId: notification.id });
 };
 
-export const archiveNotification = async (notification: Notification) => {
-  if (!novu) {
-    console.warn("Novu not configured - cannot archive notification");
-    return;
+export const unreadNotification = async (notification: Notification): Promise<NovuResponse> => {
+  try {
+    await novu.notifications.unread({ notificationId: notification.id });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to unread notification:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
-  await novu.notifications.archive({ notificationId: notification.id });
 };
 
-export const unreadNotification = async (notification: Notification) => {
-  if (!novu) {
-    console.warn("Novu not configured - cannot mark notification as unread");
-    return;
+export const archiveNotification = async (notification: Notification): Promise<NovuResponse> => {
+  try {
+    await novu.notifications.archive({ notificationId: notification.id });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to archive notification:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
-  await novu.notifications.unread({ notificationId: notification.id });
 };
+
+export const readAllNotifications = async (): Promise<NovuResponse> => {
+  try {
+    await novu.notifications.readAll();
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to read all notifications:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+};
+
+export const archiveAllNotifications = async (): Promise<NovuResponse> => {
+  try {
+    await novu.notifications.archiveAll();
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to archive all notifications:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+};
+
+export const snoozeNotification = () => { 
+  const now = new Date();
+  
+  const anHourFromNow = new Date(now);
+  anHourFromNow.setHours(anHourFromNow.getHours() + 1);
+  
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(9, 0, 0, 0); // Set to 9 AM tomorrow
+  
+  const nextWeek = new Date(now);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  nextWeek.setHours(9, 0, 0, 0); // Set to 9 AM next week
+  
+  return {
+    anHourFromNow: anHourFromNow.toISOString(),
+    tomorrow: tomorrow.toISOString(),
+    nextWeek: nextWeek.toISOString(),
+  };
+};
+
+export const snoozeNotificationWithOptions = async (notification: Notification, option: 'anHourFromNow' | 'tomorrow' | 'nextWeek'): Promise<NovuResponse> => {
+  try {
+    const snoozeOptions = snoozeNotification();
+    const snoozeUntil = snoozeOptions[option as keyof typeof snoozeOptions];
+    
+    await novu.notifications.snooze({ notificationId: notification.id, snoozeUntil });
+    
+    return { success: true, data: snoozeUntil };
+  } catch (error) {
+    console.error('Failed to snooze notification:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+};
+
+
+

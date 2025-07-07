@@ -1,19 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { BellOff, Clock, Trash2, Paperclip, ArrowUp } from "lucide-react";
+import { BellOff, Clock, Trash2, Paperclip, ArrowUp, Info, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "./ui/textarea";
-import { Notification } from "@novu/nextjs";
-import { toast } from "sonner";
-import { useCallback } from "react";
-
-interface IssueDetailProps {
-  issueId: string;
-  issueTitle: string;
-  className?: string;
-  notification?: Notification;
-  onDelete?: () => void;
-}
 
 interface ActivityItem {
   user: string;
@@ -22,14 +11,8 @@ interface ActivityItem {
   avatarUrl: string;
 }
 
-export function IssueDetail({
-  issueId,
-  issueTitle,
-  className,
-  notification,
-  onDelete,
-}: IssueDetailProps) {
-  // Hard-coded activity items
+export function IssueDetail() {
+  // DEMO DATA: This would normally be fetched from the database
   const activity: ActivityItem[] = [
     {
       user: "Radoslaw",
@@ -53,36 +36,16 @@ export function IssueDetail({
     },
   ];
 
-  const handleUnsubscribe = () => {
-    // Implement unsubscribe functionality here
-  };
 
-  const handleSnooze = () => {
-    // Implement snooze functionality here
-  };
-
-  const handleDelete = useCallback(async () => {
-    if (!notification?.id) return;
-
-    try {
-      await notification.archive();
-      toast.success("Notification deleted");
-      onDelete?.();
-    } catch (error) {
-      console.error("Failed to delete notification:", error);
-      toast.error("Failed to delete the notification");
-    }
-  }, [notification, onDelete]);
 
   return (
-    <div className={cn("h-full flex flex-col bg-background", className)}>
+    <div className={cn("h-full flex flex-col bg-background")}>
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b">
         <div className="flex items-center gap-1">
           <span className="text-md font-medium text-muted-foreground">
-            Vast.craft
+            Issue Item
           </span>
-          {notification && (
             <div className="flex items-center gap-1">
               <svg
                 width="16"
@@ -101,42 +64,151 @@ export function IssueDetail({
                 />
               </svg>
               <span className="text-md font-medium text-muted-foreground">
-                {issueId}
+                Issue Item
               </span>
             </div>
-          )}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={handleUnsubscribe}>
+          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
             <BellOff className="h-4 w-4 mr-1" />
             Unsubscribe
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleSnooze}>
+          </button>
+          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
             <Clock className="h-4 w-4 mr-1" />
             Snooze
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleDelete}>
+          </button>
+          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
             <Trash2 className="h-4 w-4 mr-1" />
             Delete notification
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Main content area with side panel */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex min-h-0 flex-col lg:flex-row">
         {/* Main content */}
-        <div className="flex-1 overflow-auto p-4 pl-8 space-y-6">
+        <div className="flex-1 overflow-auto p-4 lg:pl-8 space-y-6 min-w-0">
           {/* Description Block */}
           <div className="space-y-4 bg-background rounded-lg">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-semibold">{issueTitle}</h1>
-              <div className="text-muted-foreground whitespace-pre-wrap break-words"></div>
-            </div>
 
-            {/* Requirements and Technical Design */}
+            {/* Demo Information */}
             <div className="space-y-4">
+              <div className="bg-muted/50 border rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="space-y-3 min-w-0 flex-1">
+                    <div>
+                      <h3 className="font-medium text-foreground mb-2">Demo Notifications</h3>
+                      <p className="text-sm text-muted-foreground">
+                        All notifications displayed in this demo are hard-coded static content. To see real notifications with actual properties that the inbox can render, you need to trigger a notification using the workflow trigger code below.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium text-foreground mb-2">Workflow Trigger Code Sample</h4>
+                      <div className="bg-background border rounded-lg overflow-hidden">
+                        <div className="bg-muted px-3 py-2 border-b">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                              <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span className="text-muted-foreground text-xs ml-2 font-medium">Terminal</span>
+                            </div>
+                            <button
+                              className="h-6 w-6 p-0 hover:bg-muted-foreground/10 rounded flex items-center justify-center transition-colors"
+                              title="Copy code to clipboard (Demo: Would copy to clipboard)"
+                            >
+                              <Copy className="h-3 w-3 text-muted-foreground" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="p-3">
+                          <div className="overflow-x-auto max-h-96">
+                            <pre className="text-xs font-mono text-foreground leading-relaxed whitespace-pre-wrap break-all">
+                              <code>{`curl -X POST https://api.novu.co/v1/events/trigger \\
+  -H "Authorization: ApiKey YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+  "name": "issue-{event}",
+  "to": [
+    {
+      "type": "Topic",
+      "topicKey": "issue-ENG-158"
+    }
+  ],
+  "payload": {
+    "id": "ef42a753-366e-4352-a852-7fbc0225777c",
+    "identifier": "ENG-158",
+    "title": "Data inconsistency in invoice generation",
+    "description": "Some users are reporting discrepancies in the invoice data exported from the dashboard.",
+    "action": "assigned",
+    "eventTime": "2025-02-14T06:25:02.806Z",
+    "path": "/demo/issue/ENG-158/data-inconsistency",
+    "cta": {
+      "label": "View issue",
+      "url": "/demo/issue/ENG-158/data-inconsistency"
+    },
+    "performedBy": {
+      "id": "09fff126-dc34-425d-b5f9-72e5378a24f4",
+      "name": "Jane Developer",
+      "avatar": "https://cdn.novu.dev/avatars/jane.jpg",
+      "email": "jane@example.com"
+    },
+    "stateId": "efd22ae7-093c-41bd-b32f-2d870a3de03f",
+    "stateLabel": "In Progress",
+    "priority": 3,
+    "labelIds": [
+      "8f0b3326-91da-4c9a-ba3b-160467a0141f",
+      "ab3b779e-d8e1-4f4c-96a0-b180fc627815"
+    ],
+    "team": {
+      "id": "af7d4b2c-c579-4d92-a414-de29913ec2a3",
+      "key": "ENG",
+      "name": "Engineering",
+      "icon": "Gears",
+      "color": "#5e6ad2"
+    },
+    "group": {
+      "key": "issue-ENG-158",
+      "digest": "2h"
+    }
+  }
+}'`}</code>
+                            </pre>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Replace YOUR_API_KEY with your actual Novu API key. This will create a real notification that shows all the properties the inbox component can render.
+                      </p>
+                      <div className="bg-muted/30 border rounded p-2 mt-2">
+                        <p className="text-xs text-muted-foreground">
+                          <strong>Note:</strong> To test real notifications, you need to clone this repository and run it locally with your own Novu instance. The demo environment only shows static content.
+                        </p>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+                        <div className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                          <div>
+                            <h5 className="font-semibold text-blue-900 mb-1 text-sm">Important: Payload Optimization</h5>
+                            <p className="text-xs text-blue-800 mb-1">
+                              Not all issue data shown in this demo needs to be passed in the notification payload. Only include the necessary properties for your use case.
+                            </p>
+                            <p className="text-xs text-blue-700">
+                              <strong>Learn more:</strong> Visit the inbox directory item page to explore the workflow schema and data models for optimal payload structure.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <h3 className="font-medium mb-2">Requirements</h3>
+                <div className="text-xs text-gray-500 mb-2">(Static demo content - would be fetched from database)</div>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   <li>OAuth integration with Google and GitHub</li>
                   <li>JWT token generation and validation</li>
@@ -147,6 +219,7 @@ export function IssueDetail({
 
               <div>
                 <h3 className="font-medium mb-2">Technical Design</h3>
+                <div className="text-xs text-gray-500 mb-2">(Static demo content - would be fetched from database)</div>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   <li>Use NextAuth.js for OAuth providers</li>
                   <li>Implement JWT with refresh tokens</li>
@@ -162,11 +235,13 @@ export function IssueDetail({
           {/* Activity */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium">Activity</h3>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={handleUnsubscribe}>
+                <h3 className="font-medium">Activity</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
                   Unsubscribe
-                </Button>
+                </button>
                 <div className="flex items-center -space-x-4">
                   <Avatar className="h-[28px] w-[28px] border-2 border-background">
                     <AvatarImage
@@ -218,8 +293,9 @@ export function IssueDetail({
 
           {/* Comment Box */}
           <div className="relative mt-6">
+            <div className="text-xs text-gray-500 mb-2">(Comment functionality would sync with database)</div>
             <Textarea
-              placeholder="Leave a comment..."
+              placeholder="Leave a comment... (Demo: Would sync with database)"
               className="min-h-[100px] resize-none pb-12"
             />
             <div className="absolute bottom-2 right-2 flex gap-2">
@@ -238,13 +314,15 @@ export function IssueDetail({
         </div>
 
         {/* Side Panel */}
-        <div className="w-64 border-l p-4 space-y-3">
+        <div className="w-full lg:w-64 lg:border-l p-4 space-y-3 flex-shrink-0 border-t lg:border-t-0">
           {/* Properties Header */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">
                 Properties
               </span>
+            </div>
+            <div className="flex items-center gap-1">
               <div className="flex items-center gap-1">
                 <button
                   aria-label="Copy issue URL"

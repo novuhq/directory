@@ -169,7 +169,9 @@ export default function EmailNotificationsPage() {
           description="How often you receive notification emails"
           options={["Immediately", "Daily digest", "Weekly digest"]}
           defaultValue="Immediately"
-          onChange={(value) => console.log("Frequency changed to:", value)}
+          onChange={(value) => {
+            // Handle frequency change
+          }}
         />
 
         <FormSelect
@@ -177,7 +179,9 @@ export default function EmailNotificationsPage() {
           description="Choose your preferred email format"
           options={["HTML", "Plain text"]}
           defaultValue="HTML"
-          onChange={(value) => console.log("Format changed to:", value)}
+          onChange={(value) => {
+            // Handle format change
+          }}
           hasBorder={false}
         />
       </NotificationCard>

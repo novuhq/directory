@@ -3,35 +3,46 @@
 import { Novu } from '@novu/js';
 import React from 'react';
 
-const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
-const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID;
+// Function to get subscriber ID from localStorage
+const getSubscriberIdFromStorage = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('healthcare-subscriber-id');
+};
 
-// Only initialize Novu if environment variables are available
-const novu = applicationIdentifier && subscriberId 
-  ? new Novu({
-      applicationIdentifier,
-      subscriberId,
-    })
-  : null;
+// Function to create Novu instance with subscriber ID from localStorage
+const createNovuInstance = (subscriberId?: string) => {
+  const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
+  const actualSubscriberId = subscriberId || getSubscriberIdFromStorage();
+  
+  if (!actualSubscriberId || !applicationIdentifier) {
+    return null;
+  }
+  
+  return new Novu({
+    subscriberId: actualSubscriberId,
+    applicationIdentifier: applicationIdentifier,
+  });
+};
 
 export function useUnreadCount() {
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
-    // Don't run if Novu is not initialized
-    if (!novu) {
-      console.warn('Novu not initialized - missing environment variables');
-      return;
-    }
-
     // Only run in browser environment
     if (typeof window === 'undefined') {
       return;
     }
 
+    const novuInstance = createNovuInstance();
+    
+    // Don't run if Novu is not initialized
+    if (!novuInstance) {
+      return;
+    }
+
     async function fetchUnreadCount() {
       try {
-        const result = await novu?.notifications.count({
+        const result = await novuInstance.notifications.count({
           filters: [{ read: false }],
         });
         // Sum up all counts from the filters
@@ -57,9 +68,10 @@ export function useUnreadCount() {
   return count;
 }
 
-export async function markAllAsRead() {
-  if (!novu) {
-    console.warn('Novu not initialized - cannot mark notifications as read');
+export async function markAllAsRead(subscriberId?: string) {
+  const novuInstance = createNovuInstance(subscriberId);
+  
+  if (!novuInstance) {
     return;
   }
   
@@ -68,5 +80,5 @@ export async function markAllAsRead() {
     return;
   }
   
-  await novu.notifications.readAll({});
+  await novuInstance.notifications.readAll({});
 }

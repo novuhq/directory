@@ -8,7 +8,6 @@ The demo is deployed on Netlify and includes multiple applications:
 
 - **Healthcare Dashboard** - A comprehensive healthcare management system
 - **Linear Inbox** - Project management inbox interface
-- **Documentation** - Technical documentation and guides
 
 ## 🏗️ Project Structure
 
@@ -16,9 +15,7 @@ The demo is deployed on Netlify and includes multiple applications:
 directory/
 ├── apps/
 │   ├── healthcare/          # Healthcare management system
-│   ├── linear-inbox/        # Project management inbox
-│   ├── docs/               # Documentation site
-│   └── web/                # Web application
+│   └── linear-inbox/        # Project management inbox
 ├── packages/
 │   ├── ui/                 # Shared UI components
 │   ├── eslint-config/      # ESLint configuration
@@ -66,7 +63,6 @@ pnpm dev
 # Start specific app
 pnpm dev --filter=healthcare-app
 pnpm dev --filter=linear-inbox-app
-pnpm dev --filter=docs-app
 
 # Build all apps
 pnpm build
@@ -110,14 +106,7 @@ A project management inbox interface with:
 - Integration with external tools
 - Mobile-responsive design
 
-### Documentation (`/docs`)
 
-Technical documentation and guides including:
-
-- API documentation
-- Component library
-- Getting started guides
-- Best practices
 
 ## 🚀 Deployment
 

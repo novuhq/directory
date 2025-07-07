@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { NovuInitializer } from "@/components/NovuInitializer";
 
 export const metadata: Metadata = {
   title: "Linear Inbox",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <NovuInitializer />
+        {children}
+      </body>
     </html>
   );
 }

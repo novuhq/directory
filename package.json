@@ -1,5 +1,5 @@
 {
-  "name": "directory",
+  "name": "inbox-directory",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -9,9 +9,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "update-deps": "pnpm update --recursive",
-    "update-novu": "pnpm update @novu/js @novu/nextjs @novu/react --filter=@directory/shared-deps",
-    "install-deps": "pnpm install --recursive",
-    "setup-env": "node scripts/setup-env.js"
+    "install-deps": "pnpm install --recursive"
   },
   "devDependencies": {
     "prettier": "^3.5.3",

@@ -1,17 +1,28 @@
 'use client';
 
 import { Inbox, InboxContent } from '@novu/nextjs';
+import { useNovuSubscriber } from '../hooks/useNovuSubscriber';
 
 const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
-const subscriberId = process.env.NEXT_PUBLIC_NOVU_SUBSCRIBER_ID;
 
 export function NovuInbox() {
-  // Don't render if environment variables are missing
-  if (!applicationIdentifier || !subscriberId) {
+  const { subscriberId, isLoading, hasSubscriber } = useNovuSubscriber();
+
+  // Show loading state while subscriber ID is being determined
+  if (isLoading) {
     return (
       <div className="p-4 text-center text-gray-500">
-        <p>Notifications not configured</p>
-        <p className="text-sm">Please set up Novu environment variables</p>
+        <p>Loading notifications...</p>
+      </div>
+    );
+  }
+
+  // Show message if no subscriber ID is available
+  if (!hasSubscriber) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        <p>No subscriber ID available</p>
+        <p className="text-sm">Please refresh the page to initialize notifications</p>
       </div>
     );
   }
@@ -41,7 +52,7 @@ export function NovuInbox() {
 
   const inboxConfig = {
     applicationIdentifier,
-    subscriberId,
+    subscriberId: subscriberId!,
     tabs,
     appearance: {
       elements: {

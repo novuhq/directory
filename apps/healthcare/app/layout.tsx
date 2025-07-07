@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
+import { NovuInitializer } from '@/app/components/NovuInitializer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <NovuInitializer />
           <div className="min-h-screen bg-gray-50">
             <main className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">{children}</main>
           </div>
