@@ -1,6 +1,13 @@
 [build]
   command = "pnpm install && pnpm build"
-  publish = "out"
+  publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18" 
+  NODE_VERSION = "18"
+
+# Required environment variables (set in Netlify dashboard):
+# - NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER
+# - NOVU_SECRET_KEY
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs" 

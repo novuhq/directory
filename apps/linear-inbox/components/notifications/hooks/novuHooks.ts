@@ -120,5 +120,46 @@ export const snoozeNotificationWithCustomDuration = async (notification: Notific
   }
 };
 
+export const getNotificationPreferences = async (): Promise<NovuResponse> => {
+  try {
+    // For now, return mock data since the client-side Novu API doesn't have direct preference methods
+    // In a real implementation, you would need to use the server-side API or implement this differently
+    const mockPreferences = [
+      {
+        type: "linear-updates",
+        channels: { email: true, inApp: true, push: false },
+      },
+      {
+        type: "invite-notifications", 
+        channels: { email: true, inApp: true, push: false },
+      },
+      {
+        type: "legal-updates",
+        channels: { email: true, inApp: false, push: false },
+      },
+    ];
+    return { success: true, data: mockPreferences };
+  } catch (error) {
+    console.error('Failed to get notification preferences:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+};
+
+export const updateNotificationPreference = async (
+  workflowId: string, 
+  channelType: string, 
+  enabled: boolean
+): Promise<NovuResponse> => {
+  try {
+    // For now, just return success since the client-side Novu API doesn't have direct preference methods
+    // In a real implementation, you would need to use the server-side API or implement this differently
+    console.log(`Would update preference: ${workflowId} - ${channelType}: ${enabled}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update notification preference:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+};
+
 
 
