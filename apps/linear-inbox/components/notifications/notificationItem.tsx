@@ -16,17 +16,17 @@ export const NotificationItem = ({
   notification,
   onRefresh,
 }: NotificationItemProps) => {
-  const isRead = notification.isRead as boolean;
-  const avatarSrc = notification.avatar as string;
+  const isRead = Boolean(notification.isRead);
+  const avatarSrc = String(notification.avatar || '');
   const identifier =
-    (notification.data?.identifier as string) ||
-    (notification.subject as string);
-  const title = notification.data?.title as string;
-  const description = notification.body as string;
-  const eventTime = notification.createdAt as string;
-  const action = notification.data?.action as string;
-  const actorName = (notification.data?.performedBy as { name?: string })
-    ?.name as string;
+    String(notification.data?.identifier || 
+    notification.subject || 
+    'Unknown');
+  const title = String(notification.data?.title || 'No title');
+  const description = String(notification.body || '');
+  const eventTime = String(notification.createdAt || new Date().toISOString());
+  const action = String(notification.data?.action || '');
+  const actorName = String((notification.data?.performedBy as { name?: string })?.name || '');
 
   const handleNotificationClick = async () => {
     // Mark as read if notification is not already read
@@ -72,7 +72,7 @@ export const NotificationItem = ({
               ) : (
                 <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-700 overflow-hidden flex items-center justify-center">
                   <span className="text-sm font-medium">
-                    {actorName.charAt(0).toUpperCase()}
+                    {actorName ? actorName.charAt(0).toUpperCase() : '?'}
                   </span>
                 </div>
               )}

@@ -29,20 +29,58 @@ interface InboxHeaderProps {
   subscriberId?: string;
   showRead?: boolean;
   showUnread?: boolean;
-  showSnoozed?: boolean;
   onFiltersChange?: (filters: {
     showRead: boolean;
     showUnread: boolean;
-    showSnoozed: boolean;
   }) => void;
 }
 
 // Local storage keys for filter persistence
 const FILTER_STORAGE_KEYS = {
-  SHOW_SNOOZED: "linear-inbox-show-snoozed",
   SHOW_READ: "linear-inbox-show-read",
   SHOW_UNREAD: "linear-inbox-show-unread",
 } as const;
+
+// Custom hook for managing localStorage filter state
+const useLocalStorageFilter = (
+  propValue: boolean | undefined,
+  localStorageKey: string,
+  defaultValue: boolean
+): [boolean, (value: boolean) => void] => {
+  const [state, setState] = useState(propValue ?? defaultValue);
+
+  // Load from localStorage on mount if prop is undefined
+  useEffect(() => {
+    if (propValue === undefined) {
+      try {
+        const stored = localStorage.getItem(localStorageKey);
+        if (stored !== null) {
+          setState(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error(`Failed to load ${localStorageKey} from localStorage:`, error);
+      }
+    }
+  }, [propValue, localStorageKey]);
+
+  // Update local state when prop changes
+  useEffect(() => {
+    if (propValue !== undefined) {
+      setState(propValue);
+    }
+  }, [propValue]);
+
+  const setValue = useCallback((value: boolean) => {
+    setState(value);
+    try {
+      localStorage.setItem(localStorageKey, JSON.stringify(value));
+    } catch (error) {
+      console.error(`Failed to save ${localStorageKey} to localStorage:`, error);
+    }
+  }, [localStorageKey]);
+
+  return [state, setValue];
+};
 
 // Reusable Toggle Switch Component
 interface ToggleSwitchProps {
@@ -143,156 +181,40 @@ const DeleteIcon = () => (
   </svg>
 );
 
-const OrderingIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="currentColor"
-    role="img"
-    focusable="false"
-    xmlns="http://www.w3.org/2000/svg"
-    className="text-muted-foreground"
-  >
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M1.11178 5.47685L3.41158 2.29526C3.47069 2.20569 3.55321 2.13084 3.65174 2.0771C3.98321 1.8963 4.41316 1.99402 4.61204 2.29537L6.91183 5.47695C6.97719 5.5759 7.01172 5.68914 7.01172 5.80455C7.01172 6.15598 6.69848 6.44087 6.31191 6.44087H5.43559C5.33934 6.44122 5.06164 6.51245 5.06203 6.59995V13.0319C5.06203 13.559 4.59197 13.9863 4.01212 13.9863C3.43227 13.9863 2.96222 13.559 2.96222 13.0319L2.96222 6.59995C2.96222 6.51209 2.68389 6.44087 2.58725 6.44087H1.71233C1.58514 6.44097 1.46032 6.40955 1.35129 6.35C1.01993 6.16901 0.912701 5.77809 1.11178 5.47685Z"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M14.8999 10.5095L12.6001 13.6911C12.541 13.7806 12.4585 13.8555 12.36 13.9092C12.0285 14.09 11.5986 13.9923 11.3997 13.691L9.09989 10.5094C9.03453 10.4104 9 10.2972 9 10.1818C9 9.83034 9.31324 9.54546 9.6998 9.54546H10.5761C10.6724 9.5451 10.9501 9.47388 10.9497 9.38638L10.9497 2.95448C10.9497 2.42733 11.4198 2 11.9996 2C12.5794 2 13.0495 2.42733 13.0495 2.95448L13.0495 9.38638C13.0495 9.47423 13.3278 9.54546 13.4245 9.54546H14.2994C14.4266 9.54536 14.5514 9.57678 14.6604 9.63633C14.9918 9.81732 15.099 10.2082 14.8999 10.5095Z"
-    />
-  </svg>
-);
+
 
 export function InboxHeader({
   className,
   onRefresh,
   showRead: propShowRead,
   showUnread: propShowUnread,
-  showSnoozed: propShowSnoozed,
   onFiltersChange,
 }: InboxHeaderProps) {
   const { toast } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [ordering, setOrdering] = useState("movedToInboxAt");
   const [isMarkingAllAsRead, setIsMarkingAllAsRead] = useState(false);
   const [isArchivingAll, setIsArchivingAll] = useState(false);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
 
   // Filter states with localStorage persistence
-  const [showSnoozed, setShowSnoozed] = useState(propShowSnoozed ?? false);
-  const [showRead, setShowRead] = useState(propShowRead ?? true);
-  const [showUnread, setShowUnread] = useState(propShowUnread ?? true);
+  const [showRead, setShowRead] = useLocalStorageFilter(propShowRead, FILTER_STORAGE_KEYS.SHOW_READ, true);
+  const [showUnread, setShowUnread] = useLocalStorageFilter(propShowUnread, FILTER_STORAGE_KEYS.SHOW_UNREAD, true);
 
-  // Load filter states from localStorage on component mount
-  useEffect(() => {
-    if (propShowSnoozed === undefined) {
-      try {
-        const storedShowSnoozed = localStorage.getItem(
-          FILTER_STORAGE_KEYS.SHOW_SNOOZED
-        );
-        if (storedShowSnoozed !== null) {
-          setShowSnoozed(JSON.parse(storedShowSnoozed));
-        }
-      } catch (error) {
-        console.error("Failed to load showSnoozed from localStorage:", error);
-      }
-    }
-  }, [propShowSnoozed]);
-
-  useEffect(() => {
-    if (propShowRead === undefined) {
-      try {
-        const storedShowRead = localStorage.getItem(
-          FILTER_STORAGE_KEYS.SHOW_READ
-        );
-        if (storedShowRead !== null) {
-          setShowRead(JSON.parse(storedShowRead));
-        }
-      } catch (error) {
-        console.error("Failed to load showRead from localStorage:", error);
-      }
-    }
-  }, [propShowRead]);
-
-  useEffect(() => {
-    if (propShowUnread === undefined) {
-      try {
-        const storedShowUnread = localStorage.getItem(
-          FILTER_STORAGE_KEYS.SHOW_UNREAD
-        );
-        if (storedShowUnread !== null) {
-          setShowUnread(JSON.parse(storedShowUnread));
-        }
-      } catch (error) {
-        console.error("Failed to load showUnread from localStorage:", error);
-      }
-    }
-  }, [propShowUnread]);
-
-  // Update local state when props change
-  useEffect(() => {
-    if (propShowSnoozed !== undefined) setShowSnoozed(propShowSnoozed);
-  }, [propShowSnoozed]);
-
-  useEffect(() => {
-    if (propShowRead !== undefined) setShowRead(propShowRead);
-  }, [propShowRead]);
-
-  useEffect(() => {
-    if (propShowUnread !== undefined) setShowUnread(propShowUnread);
-  }, [propShowUnread]);
-
-  // Filter change handlers
-  const handleShowSnoozedChange = useCallback(
-    (show: boolean) => {
-      setShowSnoozed(show);
-      try {
-        localStorage.setItem(
-          FILTER_STORAGE_KEYS.SHOW_SNOOZED,
-          JSON.stringify(show)
-        );
-      } catch (error) {
-        console.error("Failed to save showSnoozed to localStorage:", error);
-      }
-      onFiltersChange?.({ showRead, showUnread, showSnoozed: show });
-    },
-    [showRead, showUnread, onFiltersChange]
-  );
-
+  // Filter change handlers with onFiltersChange callback
   const handleShowReadChange = useCallback(
     (show: boolean) => {
       setShowRead(show);
-      try {
-        localStorage.setItem(
-          FILTER_STORAGE_KEYS.SHOW_READ,
-          JSON.stringify(show)
-        );
-      } catch (error) {
-        console.error("Failed to save showRead to localStorage:", error);
-      }
-      onFiltersChange?.({ showRead: show, showUnread, showSnoozed });
+      onFiltersChange?.({ showRead: show, showUnread });
     },
-    [showUnread, showSnoozed, onFiltersChange]
+    [setShowRead, showUnread, onFiltersChange]
   );
 
   const handleShowUnreadChange = useCallback(
     (show: boolean) => {
       setShowUnread(show);
-      try {
-        localStorage.setItem(
-          FILTER_STORAGE_KEYS.SHOW_UNREAD,
-          JSON.stringify(show)
-        );
-      } catch (error) {
-        console.error("Failed to save showUnread to localStorage:", error);
-      }
-      onFiltersChange?.({ showRead, showUnread: show, showSnoozed });
+      onFiltersChange?.({ showRead, showUnread: show });
     },
-    [showRead, showSnoozed, onFiltersChange]
+    [setShowUnread, showRead, onFiltersChange]
   );
 
   const handleMarkAllAsRead = async () => {
@@ -455,33 +377,8 @@ export function InboxHeader({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 p-3">
-              {/* Ordering Section */}
-              <div className="mb-4">
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 text-sm font-medium text-foreground whitespace-nowrap">
-                    <OrderingIcon />
-                    Ordering
-                  </label>
-                  <select
-                    value={ordering}
-                    onChange={(e) => setOrdering(e.target.value)}
-                    className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                    <option value="movedToInboxAt">Newest</option>
-                    <option value="reverseMovedToInboxAt">Oldest</option>
-                    <option value="priority">Priority</option>
-                  </select>
-                </div>
-              </div>
-
               {/* Switch Toggles Section */}
               <div className="mb-4 space-y-3">
-                <ToggleSwitch
-                  id="showSnoozed"
-                  checked={showSnoozed}
-                  onCheckedChange={handleShowSnoozedChange}
-                  label="Show snoozed"
-                />
                 <ToggleSwitch
                   id="showRead"
                   checked={showRead}

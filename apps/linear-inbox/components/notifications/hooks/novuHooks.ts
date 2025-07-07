@@ -1,9 +1,18 @@
 import { Novu, Notification } from "@novu/js";
 import { getSubscriberId } from "@/lib/subscriberUtils";
- 
+
+// Validate required environment variable
+const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
+if (!applicationIdentifier) {
+  throw new Error(
+    'NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER environment variable is required but not defined. ' +
+    'Please ensure this variable is set in your environment configuration.'
+  );
+}
+
 const novu = new Novu({
   subscriberId: getSubscriberId(),
-  applicationIdentifier: process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER as string,
+  applicationIdentifier,
 });
 
 interface NovuResponse {
@@ -91,6 +100,20 @@ export const snoozeNotificationWithOptions = async (notification: Notification, 
     await novu.notifications.snooze({ notificationId: notification.id, snoozeUntil });
     
     return { success: true, data: snoozeUntil };
+  } catch (error) {
+    console.error('Failed to snooze notification:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+};
+
+export const snoozeNotificationWithCustomDuration = async (notification: Notification, minutes: number): Promise<NovuResponse> => {
+  try {
+    const now = new Date();
+    const snoozeUntil = new Date(now.getTime() + minutes * 60 * 1000);
+    
+    await novu.notifications.snooze({ notificationId: notification.id, snoozeUntil: snoozeUntil.toISOString() });
+    
+    return { success: true, data: snoozeUntil.toISOString() };
   } catch (error) {
     console.error('Failed to snooze notification:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };

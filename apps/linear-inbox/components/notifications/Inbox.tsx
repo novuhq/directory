@@ -19,7 +19,7 @@ export default function CustomInbox() {
   const inboxConfig = {
     applicationIdentifier:
       process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER || "",
-    subscriberId: subscriberId!,
+    subscriberId: subscriberId,
     appearance: {
       elements: {
         inboxHeader: {

@@ -15,6 +15,7 @@ import {
   unreadNotification,
   archiveNotification,
   snoozeNotificationWithOptions,
+  snoozeNotificationWithCustomDuration,
 } from "./hooks/novuHooks";
 
 interface NotificationContextMenuProps {
@@ -81,9 +82,9 @@ export const NotificationContextMenu = ({
   const handleSnooze = useCallback(
     async (minutes: number) => {
       try {
-        const result = await snoozeNotificationWithOptions(
+        const result = await snoozeNotificationWithCustomDuration(
           notification,
-          "anHourFromNow"
+          minutes
         );
         if (result.success) {
           onDelete?.(notification);
