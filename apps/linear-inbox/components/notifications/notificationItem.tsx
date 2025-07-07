@@ -22,7 +22,7 @@ export const NotificationItem = ({
     String(notification.data?.identifier || 
     notification.subject || 
     'Unknown');
-  const title = String(notification.data?.title || 'No title');
+  const title = String(notification.data?.title || '');
   const description = String(notification.body || '');
   const eventTime = String(notification.createdAt || new Date().toISOString());
   const action = String(notification.data?.action || '');
