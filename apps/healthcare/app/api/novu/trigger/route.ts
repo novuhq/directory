@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Novu } from '@novu/api';
 
+// Define all healthcare workflows
+const HEALTHCARE_WORKFLOWS = [
+  'healthcare-messages',
+  'healthcare-lab-results',
+  'healthcare-appointment-reminder',
+  'healthcare-prescription-refill-reminder',
+  'healthcare-outstanding-balance-reminder',
+  'healthcare-rescheduled-by-clinic'
+] as const;
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { subscriberId } = body;
+    const { subscriberId, payload = {} } = body;
 
     if (!subscriberId) {
       return NextResponse.json({ error: 'Missing subscriberId' }, { status: 400 });
@@ -17,25 +27,45 @@ export async function POST(req: NextRequest) {
 
     const novu = new Novu({ secretKey });
 
-    // Trigger the workflow (subscriber will be created if not exists)
-    const result = await novu.trigger({
-      workflowId: 'healthcare-patient-notifications',
-      to: { subscriberId },
-      payload: {
-        message: 'Welcome to Healthcare Portal!',
-        features: [
-          'Appointment notifications',
-          'Medication reminders',
-          'Test results',
-          'Billing updates',
-        ],
-        setupComplete: true,
-      },
+    // Trigger all healthcare workflows simultaneously
+    const triggerPromises = HEALTHCARE_WORKFLOWS.map(async (workflowId) => {
+      try {
+        const result = await novu.trigger({
+          workflowId,
+          to: { subscriberId },
+          payload,
+        });
+        return { workflowId, success: true, result };
+      } catch (error) {
+        console.error(`Error triggering ${workflowId}:`, error);
+        return { 
+          workflowId, 
+          success: false, 
+          error: error instanceof Error ? error.message : 'Unknown error' 
+        };
+      }
     });
 
-    return NextResponse.json({ success: true, result });
-  } catch (error: any) {
+    // Wait for all workflows to complete
+    const results = await Promise.all(triggerPromises);
+
+    // Count successes and failures
+    const successful = results.filter(r => r.success);
+    const failed = results.filter(r => !r.success);
+
+    return NextResponse.json({ 
+      success: true,
+      summary: {
+        total: HEALTHCARE_WORKFLOWS.length,
+        successful: successful.length,
+        failed: failed.length
+      },
+      results,
+      triggeredWorkflows: HEALTHCARE_WORKFLOWS
+    });
+  } catch (error: unknown) {
     console.error('Novu trigger error:', error);
-    return NextResponse.json({ error: error?.message || 'Unknown error' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 } 

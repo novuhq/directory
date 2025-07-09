@@ -43,6 +43,28 @@ export function NovuInbox() {
         inbox__popoverTrigger: {
           display: 'none',
         },
+        notificationPrimaryAction__button: {
+          backgroundColor: '#000000',
+          color: '#ffffff',
+          padding: '8px 16px',
+          border: '1px solid #000000',
+          borderRadius: '6px',
+          fontWeight: '500',
+          '&:hover': {
+            backgroundColor: '#333333',
+          },
+        },
+        notificationSecondaryAction__button: {
+          backgroundColor: '#ffffff',
+          color: '#000000',
+          padding: '8px 16px',
+          border: '1px solid #000000',
+          borderRadius: '6px',
+          fontWeight: '500',
+          '&:hover': {
+            backgroundColor: '#f5f5f5',
+          },
+        },
       },
     },
   };

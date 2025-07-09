@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@directory/shared-deps": "workspace:*",
+    "@novu/api": "^1.4.0",
     "next": "15.2.4",
     "react": "^19",
     "react-dom": "^19"

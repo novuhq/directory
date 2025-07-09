@@ -30,6 +30,9 @@ importers:
       '@directory/shared-deps':
         specifier: workspace:*
         version: link:../../packages/shared-deps
+      '@novu/api':
+        specifier: ^1.4.0
+        version: 1.4.0(zod@3.25.74)
       next:
         specifier: 15.2.4
         version: 15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
