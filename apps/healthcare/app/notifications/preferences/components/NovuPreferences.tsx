@@ -1,23 +1,12 @@
 'use client';
 
-import { Inbox } from '@novu/nextjs';
-import { useNovuSubscriber } from '../../hooks/useNovuSubscriber';
+import { useNovuSubscriber } from '@/app/notifications/hooks/useNovuSubscriber';
 
 const applicationIdentifier = process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER;
 
 export function NovuPreferences() {
   const { subscriberId, isLoading, hasSubscriber } = useNovuSubscriber();
 
-  // Debug information
-  console.log('NovuPreferences Debug:', {
-    applicationIdentifier,
-    subscriberId,
-    isLoading,
-    hasSubscriber,
-    localStorage: typeof window !== 'undefined' ? localStorage.getItem('healthcare-subscriber-id') : 'server'
-  });
-
-  // Show loading state while subscriber ID is being determined
   if (isLoading) {
     return (
       <div className="p-4 text-center text-gray-500">
@@ -26,7 +15,6 @@ export function NovuPreferences() {
     );
   }
 
-  // Show message if no subscriber ID is available
   if (!hasSubscriber) {
     return (
       <div className="p-4 text-center text-gray-500">
@@ -42,7 +30,6 @@ export function NovuPreferences() {
     );
   }
 
-  // Show message if no application identifier is available
   if (!applicationIdentifier) {
     return (
       <div className="p-4 text-center text-gray-500">
@@ -54,7 +41,6 @@ export function NovuPreferences() {
     );
   }
 
-  // For now, let's show a simple preferences interface instead of the Novu Inbox
   return (
     <div className="w-full p-6 bg-white rounded-lg border">
       <h2 className="text-xl font-semibold mb-4">Notification Preferences</h2>
@@ -90,12 +76,6 @@ export function NovuPreferences() {
           </div>
           <input type="checkbox" defaultChecked className="w-4 h-4" />
         </div>
-      </div>
-      
-      <div className="mt-6 p-4 bg-blue-50 rounded">
-        <p className="text-sm text-blue-800">
-          <strong>Debug Info:</strong> Subscriber ID: {subscriberId}, App ID: {applicationIdentifier}
-        </p>
       </div>
     </div>
   );
