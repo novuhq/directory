@@ -104,6 +104,9 @@ importers:
       '@radix-ui/react-visually-hidden':
         specifier: ^1.2.3
         version: 1.2.3(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      api@latest:
+        specifier: link:novu/api@latest
+        version: link:novu/api@latest
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
