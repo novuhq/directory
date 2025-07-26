@@ -1,0 +1,10 @@
+[build]
+  command = "cd healthcare && pnpm install && pnpm build"
+  base = "healthcare"
+
+[build.environment]
+  NPM_FLAGS = "--version"
+  NODE_VERSION = "18"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs" 
